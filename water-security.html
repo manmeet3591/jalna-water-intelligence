@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Water Security · Jalna Water Intelligence</title>
+  <meta name="description" content="Water security indicators for Jalna district — scarcity index, stress levels, seasonal availability, and storage adequacy.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+:root{
+  --bg:#F5EDE8;--bg-card:#FFFFFF;--bg-sub:#FBF5F2;--bg-hdr:#1E0A04;
+  --fg:#1E0A04;--fg-muted:#6A3A28;--fg-subtle:#A87A68;
+  --border:#E8CCC0;--border-str:#D4A890;
+  --acc:#C4521A;--acc2:#A43810;--acc-crit:#C2321A;--acc-warn:#D4711A;--acc-ok:#28844A;--acc-safe:#1872A8;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#1A0A04;--bg-card:#281410;--bg-sub:#200C08;--bg-hdr:#100602;
+  --fg:#F0D4C4;--fg-muted:#A07060;--fg-subtle:#603828;
+  --border:#401810;--border-str:#602820;color-scheme:dark;}
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--fg);font-size:14px;line-height:1.5;}
+nav{background:var(--bg-hdr);padding:10px 24px;display:flex;gap:20px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.08);}
+nav a{color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;text-decoration:none;letter-spacing:0.04em;text-transform:uppercase;padding:4px 0;border-bottom:2px solid transparent;}
+nav a.active,nav a:hover{color:#fff;border-bottom-color:var(--acc);}
+nav .nav-brand{color:#fff;font-size:13px;font-weight:700;margin-right:12px;white-space:nowrap;}
+.site-header{background:var(--bg-hdr);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.hdr-title h1{font-size:18px;font-weight:700;letter-spacing:-0.01em;}
+.hdr-title p{font-size:11px;color:rgba(255,255,255,0.48);margin-top:2px;}
+.hdr-right{display:flex;align-items:center;gap:12px;}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:rgba(194,50,26,0.2);color:#FF8C78;border:1px solid rgba(194,50,26,0.45);}
+.status-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.6s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+.hdr-ts{font-size:11px;color:rgba(255,255,255,0.38);}
+.page{max-width:1280px;margin:0 auto;padding:18px 20px 48px;}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px 14px 20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.c1::before{background:var(--acc-crit);}
+.c2::before{background:var(--acc-warn);}
+.c3::before{background:var(--acc);}
+.c4::before{background:var(--acc-ok);}
+.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-muted);margin-bottom:5px;}
+.stat-val{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:4px;}
+.c1 .stat-val{color:var(--acc-crit);}
+.c2 .stat-val{color:var(--acc-warn);}
+.c3 .stat-val{color:var(--acc);}
+.c4 .stat-val{color:var(--acc-ok);}
+.stat-note{font-size:11px;color:var(--fg-muted);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;}
+.full-width{grid-column:1/-1;}
+.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.chart-title{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:2px;}
+.chart-sub{font-size:11px;color:var(--fg-muted);margin-bottom:12px;}
+.chart-wrap{position:relative;height:200px;}
+.chart-wrap.tall{height:240px;}
+.chart-src{font-size:10px;color:var(--fg-subtle);font-style:italic;margin-top:8px;}
+.chart-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-muted);}
+.cl-swatch{width:16px;height:3px;border-radius:2px;flex-shrink:0;}
+.falken-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
+.falken-title{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:12px;}
+.falken-bar{height:24px;border-radius:4px;background:linear-gradient(to right,#28844A 0%,#C4961C 20%,#D4711A 40%,#C2321A 60%,#8A0010 100%);position:relative;margin-bottom:6px;}
+.falken-marker{position:absolute;top:-6px;width:3px;height:36px;background:var(--fg);border-radius:2px;}
+.falken-marker::after{content:attr(data-label);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--fg);white-space:nowrap;}
+.falken-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--fg-muted);margin-bottom:4px;}
+.falken-labels{display:flex;font-size:10px;color:var(--fg-muted);}
+.falken-labels span{flex:1;text-align:center;}
+.district-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.d-chip{background:var(--bg-sub);border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;}
+.d-name{font-size:11px;font-weight:600;color:var(--fg);}
+.d-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;}
+.d-label{font-size:10px;color:var(--fg-muted);}
+.site-footer{background:var(--bg-card);border-top:1px solid var(--border);padding:18px 24px;margin-top:32px;}
+.footer-inner{max-width:1280px;margin:0 auto;display:flex;gap:32px;flex-wrap:wrap;justify-content:space-between;}
+.ft-block{font-size:11px;color:var(--fg-subtle);line-height:1.7;}
+.ft-block strong{display:block;color:var(--fg-muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+@media(max-width:800px){.two-col{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.district-grid{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Jalna Water Intelligence</span>
+  <a href="index.html">Overview</a>
+  <a href="mandala-talab.html">Mandala Talab</a>
+  <a href="water-security.html" class="active">Water Security</a>
+  <a href="domestic-water-supply.html">Domestic Supply</a>
+  <a href="water-equity.html">Water Equity</a>
+</nav>
+
+<header class="site-header">
+  <div>
+    <div class="hdr-title">
+      <h1>Water Security — Jalna District</h1>
+      <p>Falkenmark stress index · Seasonal availability · Storage adequacy · Dummy data prototype</p>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="status-pill">High Scarcity</span>
+    <span class="hdr-ts">2026 Assessment</span>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="stats-row">
+    <div class="stat-card c1">
+      <div class="stat-lbl">Per-Capita Availability</div>
+      <div class="stat-val">620</div>
+      <div class="stat-note">m³/person/year · Absolute scarcity threshold &lt;500</div>
+    </div>
+    <div class="stat-card c2">
+      <div class="stat-lbl">WRI Water Stress</div>
+      <div class="stat-val">4.1/5</div>
+      <div class="stat-note">Extremely High (Aqueduct score)</div>
+    </div>
+    <div class="stat-card c3">
+      <div class="stat-lbl">Months of Scarcity</div>
+      <div class="stat-val">7.5</div>
+      <div class="stat-note">of 12 · up from 5.2 in 2020</div>
+    </div>
+    <div class="stat-card c4">
+      <div class="stat-lbl">Storage Coverage</div>
+      <div class="stat-val">18 days</div>
+      <div class="stat-note">of peak-demand buffer remaining</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px;">
+    <div class="falken-card">
+      <div class="falken-title">Falkenmark Water Stress Index — Jalna 2026</div>
+      <div style="margin:18px 0 8px;position:relative;padding-top:22px;">
+        <div class="falken-bar">
+          <div class="falken-marker" data-label="620 m³" style="left:calc(37% - 1.5px)"></div>
+        </div>
+      </div>
+      <div class="falken-ticks">
+        <span>0</span><span>500</span><span>850</span><span>1,700</span><span>3,000+</span>
+      </div>
+      <div class="falken-labels">
+        <span style="color:#8A0010">Absolute</span>
+        <span style="color:#C2321A">Scarcity</span>
+        <span style="color:#D4711A">Stress</span>
+        <span style="color:#28844A">Adequate</span>
+      </div>
+      <p style="font-size:11px;color:var(--fg-muted);margin-top:10px;line-height:1.6;">Jalna's per-capita availability of <strong style="color:var(--acc-crit)">620 m³/yr</strong> places it firmly in the <strong>Water Scarcity</strong> zone — below the 1,700 m³ stress threshold. Marathwada average: 680 m³/yr.</p>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Monthly Water Availability Index</div>
+      <div class="chart-sub">Demand vs supply ratio · 2026 vs historical mean</div>
+      <div class="chart-wrap"><canvas id="availChart"></canvas></div>
+      <div class="chart-legend">
+        <span class="cl-item"><span class="cl-swatch" style="background:#C2321A"></span>2026</span>
+        <span class="cl-item"><span class="cl-swatch" style="background:#1872A8;opacity:0.6"></span>2010–2020 avg</span>
+        <span class="cl-item"><span class="cl-swatch" style="background:#28844A;height:1px;border-top:2px dashed #28844A"></span>Threshold</span>
+      </div>
+      <div class="chart-src">Source: CWC · IMD · Maharashtra WRD · dummy data</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="chart-card">
+      <div class="chart-title">Water Stress — Taluka Comparison</div>
+      <div class="chart-sub">Withdrawal-to-availability ratio by taluka (2026)</div>
+      <div class="chart-wrap"><canvas id="talukaChart"></canvas></div>
+      <div class="chart-legend">
+        <span class="cl-item"><span class="cl-swatch" style="background:#C2321A"></span>Extreme (&gt;80%)</span>
+        <span class="cl-item"><span class="cl-swatch" style="background:#D4711A"></span>High (40–80%)</span>
+        <span class="cl-item"><span class="cl-swatch" style="background:#C4961C"></span>Medium (20–40%)</span>
+      </div>
+      <div class="chart-src">Dummy data · illustrative</div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-title">Water Availability Trend (m³/person/year)</div>
+      <div class="chart-sub">2010–2026 trend · Jalna district</div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      <div class="chart-legend">
+        <span class="cl-item"><span class="cl-swatch" style="background:#C4521A"></span>Availability</span>
+        <span class="cl-item"><span class="cl-swatch" style="background:#C2321A;height:1px;border-top:2px dashed #C2321A"></span>Scarcity line (1,000)</span>
+      </div>
+      <div class="chart-src">Dummy data · illustrative trend</div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="ft-block"><strong>Indicators</strong>Falkenmark Water Stress Index · WRI Aqueduct 4.0 · CWC Reservoir Data · IMD Rainfall</div>
+    <div class="ft-block"><strong>Methodology</strong>Per-capita availability = total renewable freshwater ÷ district population. All values are dummy data for prototype demonstration.</div>
+    <div class="ft-block"><strong>Produced by</strong>DSOC AI Research Lab · Western Kentucky University<br>dsocai.students@wku.edu</div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+Chart.defaults.font.family="'IBM Plex Sans',system-ui,sans-serif";
+const isDark=window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+const tc={text:isDark?'#F0D4C4':'#1E0A04',muted:isDark?'#A07060':'#6A3A28',grid:isDark?'rgba(64,24,16,0.5)':'rgba(0,0,0,0.06)',card:isDark?'#281410':'#fff'};
+
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const avail26=[0.48,0.40,0.32,0.25,0.18,0.14,0.28,0.42,0.52,0.46,0.35,0.28];
+const availHist=[0.70,0.62,0.56,0.50,0.44,0.40,0.58,0.72,0.80,0.74,0.62,0.58];
+
+new Chart(document.getElementById('availChart'),{
+  type:'line',
+  data:{labels:MONTHS,datasets:[
+    {label:'2026',data:avail26,borderColor:'#C2321A',backgroundColor:'rgba(194,50,26,0.08)',fill:true,borderWidth:2.5,tension:0.4,pointRadius:3,pointBackgroundColor:'#C2321A',pointBorderColor:tc.card,pointBorderWidth:1.5},
+    {label:'Hist avg',data:availHist,borderColor:'rgba(24,114,168,0.6)',borderDash:[5,3],borderWidth:1.8,fill:false,tension:0.4,pointRadius:0},
+    {label:'Threshold',data:Array(12).fill(0.40),borderColor:'rgba(40,132,74,0.6)',borderDash:[3,4],borderWidth:1.2,fill:false,pointRadius:0}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:tc.card,titleColor:tc.text,bodyColor:tc.muted,borderColor:'#C4521A',borderWidth:1,padding:10,cornerRadius:6}},scales:{x:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11}}},y:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11},callback:v=>v.toFixed(1)},min:0,max:1.0,title:{display:true,text:'Supply/Demand ratio',color:tc.muted,font:{size:10}}}}}
+});
+
+const talukas=['Jalna','Badnapur','Bhokardan','Jafrabad','Mantha','Ambad','Ghansawangi','Partur'];
+const stressVals=[88,82,76,70,64,58,52,45];
+const stressColors=stressVals.map(v=>v>80?'rgba(194,50,26,0.78)':v>40?'rgba(212,113,26,0.78)':'rgba(196,150,28,0.78)');
+
+new Chart(document.getElementById('talukaChart'),{
+  type:'bar',
+  data:{labels:talukas,datasets:[{label:'Stress %',data:stressVals,backgroundColor:stressColors,borderRadius:3,borderSkipped:false}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:tc.card,titleColor:tc.text,bodyColor:tc.muted,borderColor:'#C4521A',borderWidth:1,padding:10,cornerRadius:6}},scales:{x:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11},callback:v=>v+'%'},min:0,max:100},y:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:10}}}}}
+});
+
+const years=['2010','2012','2014','2016','2018','2020','2022','2024','2026'];
+const perCap=[1240,1150,1080,1020,940,880,780,720,620];
+new Chart(document.getElementById('trendChart'),{
+  type:'line',
+  data:{labels:years,datasets:[
+    {label:'m³/person/yr',data:perCap,borderColor:'#C4521A',backgroundColor:'rgba(196,82,26,0.1)',fill:true,borderWidth:2.5,tension:0.3,pointRadius:4,pointBackgroundColor:'#C4521A',pointBorderColor:tc.card,pointBorderWidth:1.5},
+    {label:'Scarcity line',data:Array(9).fill(1000),borderColor:'rgba(194,50,26,0.55)',borderDash:[5,3],borderWidth:1.5,fill:false,pointRadius:0}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:tc.card,titleColor:tc.text,bodyColor:tc.muted,borderColor:'#C4521A',borderWidth:1,padding:10,cornerRadius:6}},scales:{x:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11}}},y:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11},callback:v=>v+' m³'},min:400,max:1400}}}
+});
+</script>
+</body>
+</html>
