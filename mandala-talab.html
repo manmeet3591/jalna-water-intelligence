@@ -1,265 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Mandala Talab · Jalna Water Intelligence</title>
-  <meta name="description" content="Satellite-derived monitoring of Mandala Talab reservoir, Jalna district, Marathwada — water level, extent, and community dependence.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <style>
-:root{
-  --bg:#EBF2F5;--bg-card:#FFFFFF;--bg-sub:#F2F7FA;--bg-hdr:#0A1E2E;
-  --fg:#0A1E2E;--fg-muted:#3E5A6E;--fg-subtle:#7A9AAE;
-  --border:#C2D8E8;--border-str:#8AB8D0;
-  --acc:#1872A8;--acc2:#0D5A88;--acc-warn:#D4711A;--acc-crit:#C2321A;--acc-ok:#28844A;
-  color-scheme:light;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mandala Talab — Jalna Water Intelligence</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ── Tokens ── */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface2: #f0f3f7;
+  --border: #d8dde6;
+  --fg: #111820;
+  --fg2: #3a4553;
+  --fg3: #6b7785;
+  --accent: #1A5CA8;
+  --accent-dim: rgba(26,92,168,0.08);
+  --pending: #6b7785;
+  --pending-bg: rgba(107,119,133,0.10);
+  --warn: #7a4f00;
+  --warn-bg: rgba(200,130,0,0.10);
+  --ok: #1a7840;
+  --ok-bg: rgba(26,120,64,0.10);
+  --header-bg: #0f1e33;
+  --header-fg: #e8edf5;
+  --nav-active: #3a8fdf;
+  color-scheme: light;
 }
-@media(prefers-color-scheme:dark){
-  :root{--bg:#071420;--bg-card:#0D1F30;--bg-sub:#091828;--bg-hdr:#040E1A;
-  --fg:#D4E8F4;--fg-muted:#5A88A4;--fg-subtle:#2A5070;
-  --border:#0E3050;--border-str:#184870;color-scheme:dark;}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117;
+    --surface: #161c26;
+    --surface2: #1c2433;
+    --border: #2a3548;
+    --fg: #e4ecf5;
+    --fg2: #a8b9ce;
+    --fg3: #6b7e96;
+    --accent: #3a8fdf;
+    --accent-dim: rgba(58,143,223,0.10);
+    --pending: #6b7e96;
+    --pending-bg: rgba(107,126,150,0.12);
+    --warn: #c89040;
+    --warn-bg: rgba(200,144,64,0.12);
+    --ok: #3ab870;
+    --ok-bg: rgba(58,184,112,0.10);
+    --header-bg: #060c15;
+    --header-fg: #c8d8ec;
+    color-scheme: dark;
+  }
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--bg);color:var(--fg);font-size:14px;line-height:1.5;}
-nav{background:var(--bg-hdr);padding:10px 24px;display:flex;gap:20px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.08);}
-nav a{color:rgba(255,255,255,0.5);font-size:11px;font-weight:600;text-decoration:none;letter-spacing:0.04em;text-transform:uppercase;padding:4px 0;border-bottom:2px solid transparent;}
-nav a.active,nav a:hover{color:#fff;border-bottom-color:var(--acc);}
-nav .nav-brand{color:#fff;font-size:13px;font-weight:700;margin-right:12px;white-space:nowrap;}
-.site-header{background:var(--bg-hdr);color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-.hdr-title h1{font-size:18px;font-weight:700;letter-spacing:-0.01em;}
-.hdr-title p{font-size:11px;color:rgba(255,255,255,0.48);margin-top:2px;}
-.hdr-right{display:flex;align-items:center;gap:12px;}
-.status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;background:rgba(194,50,26,0.2);color:#FF8C78;border:1px solid rgba(194,50,26,0.45);}
-.status-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;animation:blink 1.6s ease-in-out infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
-.hdr-ts{font-size:11px;color:rgba(255,255,255,0.38);}
-.page{max-width:1280px;margin:0 auto;padding:18px 20px 48px;}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
-.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px 14px 20px;position:relative;overflow:hidden;}
-.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
-.c-level::before{background:var(--acc-crit);}
-.c-area::before{background:var(--acc);}
-.c-dep::before{background:var(--acc-warn);}
-.c-rain::before{background:var(--acc-ok);}
-.stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-muted);margin-bottom:5px;}
-.stat-val{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;margin-bottom:4px;}
-.c-level .stat-val{color:var(--acc-crit);}
-.c-area .stat-val{color:var(--acc);}
-.c-dep .stat-val{color:var(--acc-warn);}
-.c-rain .stat-val{color:var(--acc-ok);}
-.stat-note{font-size:11px;color:var(--fg-muted);}
-.main-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;margin-bottom:16px;align-items:start;}
-.map-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.map-label{background:var(--bg-sub);border-bottom:1px solid var(--border);padding:10px 16px;font-size:12px;font-weight:600;color:var(--fg);display:flex;align-items:center;justify-content:space-between;}
-.map-label span{font-size:10px;color:var(--fg-muted);font-weight:400;}
-#map{height:380px;}
-.map-legend{padding:10px 16px;border-top:1px solid var(--border);display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--bg-sub);}
-.leg-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--fg-subtle);margin-right:2px;}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-muted);}
-.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-.sidebar{display:flex;flex-direction:column;gap:12px;}
-.s-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
-.s-card h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--fg-muted);margin-bottom:10px;}
-.info-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);}
-.info-row:last-child{border-bottom:none;}
-.info-key{font-size:11px;color:var(--fg-muted);}
-.info-val{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums;}
-.alert-box{background:rgba(194,50,26,0.08);border:1px solid rgba(194,50,26,0.25);border-radius:6px;padding:10px 12px;}
-.alert-box p{font-size:11px;color:var(--fg-muted);line-height:1.6;}
-.alert-box strong{color:var(--acc-crit);}
-.charts-row{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px 18px;}
-.chart-title{font-size:13px;font-weight:600;color:var(--fg);margin-bottom:2px;}
-.chart-sub{font-size:11px;color:var(--fg-muted);margin-bottom:12px;}
-.chart-wrap{position:relative;height:185px;}
-.chart-src{font-size:10px;color:var(--fg-subtle);font-style:italic;margin-top:8px;}
-.chart-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
-.cl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg-muted);}
-.cl-swatch{width:16px;height:3px;border-radius:2px;flex-shrink:0;}
-.site-footer{background:var(--bg-card);border-top:1px solid var(--border);padding:18px 24px;margin-top:32px;}
-.footer-inner{max-width:1280px;margin:0 auto;display:flex;gap:32px;flex-wrap:wrap;justify-content:space-between;}
-.ft-block{font-size:11px;color:var(--fg-subtle);line-height:1.7;}
-.ft-block strong{display:block;color:var(--fg-muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
-@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr 1fr;}.charts-row{grid-template-columns:1fr;}}
-  </style>
+:root[data-theme="dark"] {
+  --bg: #0d1117; --surface: #161c26; --surface2: #1c2433;
+  --border: #2a3548; --fg: #e4ecf5; --fg2: #a8b9ce; --fg3: #6b7e96;
+  --accent: #3a8fdf; --accent-dim: rgba(58,143,223,0.10);
+  --pending: #6b7e96; --pending-bg: rgba(107,126,150,0.12);
+  --warn: #c89040; --warn-bg: rgba(200,144,64,0.12);
+  --ok: #3ab870; --ok-bg: rgba(58,184,112,0.10);
+  --header-bg: #060c15; --header-fg: #c8d8ec; color-scheme: dark;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 15px;
+  line-height: 1.6;
+  padding-inline: 0;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Nav ── */
+nav {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 52px;
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  flex-wrap: wrap;
+}
+.nav-brand {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  margin-right: 32px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a {
+  color: rgba(255,255,255,0.65);
+  font-size: 13.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-links a.active { color: var(--nav-active); background: rgba(58,143,223,0.12); }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.theme-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.theme-btn:hover { background: rgba(255,255,255,0.14); }
+
+/* ── Page header ── */
+.page-header {
+  background: var(--header-bg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 28px 24px 24px;
+  color: var(--header-fg);
+}
+.page-header-inner { max-width: 900px; margin: 0 auto; }
+.page-header h1 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: -0.01em; }
+.page-subtitle { font-size: 14px; color: rgba(255,255,255,0.55); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.page-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 3px 10px; border-radius: 20px;
+  background: rgba(26,92,168,0.22); color: #7ab8f5;
+  border: 1px solid rgba(58,143,223,0.25);
+  text-transform: uppercase;
+}
+.badge-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #7ab8f5;
+  animation: pulse-blue 2.2s ease-in-out infinite;
+}
+@keyframes pulse-blue {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.75); }
+}
+
+/* ── Honesty Banner ── */
+.honesty-banner {
+  background: var(--accent-dim);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 13px 18px;
+  margin: 24px auto;
+  max-width: 900px;
+  font-size: 13.5px;
+  color: var(--fg2);
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.honesty-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.honesty-banner strong { color: var(--accent); }
+
+/* ── Main layout ── */
+main { max-width: 900px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* ── Section titles ── */
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--fg3);
+  margin: 32px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Identity card ── */
+.identity-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.identity-map-strip {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+#map { width: 100%; height: 100%; }
+.identity-body { padding: 22px 24px 24px; }
+.identity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px 24px;
+  margin-top: 8px;
+}
+.id-field label {
+  display: block;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg3);
+  margin-bottom: 3px;
+}
+.id-field .id-value {
+  font-size: 15px; font-weight: 500; color: var(--fg);
+}
+.id-field .id-value.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+}
+
+/* ── Tag chips ── */
+.tag {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 7px; border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.tag-pend { background: var(--pending-bg); color: var(--pending); }
+.tag-obs  { background: rgba(26,120,64,0.12); color: #1a7840; }
+.tag-off  { background: rgba(26,92,168,0.10); color: #1a5ca8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tag-obs  { color: #3ab870; }
+  :root:not([data-theme="light"]) .tag-off  { color: #3a8fdf; }
+}
+:root[data-theme="dark"] .tag-obs  { color: #3ab870; }
+:root[data-theme="dark"] .tag-off  { color: #3a8fdf; }
+
+/* ── Data readiness checklist ── */
+.checklist-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.checklist-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.checklist-header h3 { font-size: 14px; font-weight: 600; color: var(--fg); }
+.checklist-header .readiness-count { font-size: 12px; color: var(--fg3); }
+table.checklist {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+table.checklist th {
+  padding: 9px 16px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg3);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+table.checklist td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg2);
+  vertical-align: top;
+}
+table.checklist tr:last-child td { border-bottom: none; }
+table.checklist td:first-child { width: 40px; text-align: center; }
+table.checklist td.metric-name { color: var(--fg); font-weight: 500; }
+.status-pending {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--pending);
+  background: var(--pending-bg);
+  padding: 2px 8px; border-radius: 4px;
+}
+.status-ok {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; color: var(--ok);
+  background: var(--ok-bg);
+  padding: 2px 8px; border-radius: 4px;
+}
+.row-icon { font-size: 16px; }
+
+/* ── No-data commitment box ── */
+.commitment-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+.commitment-box p { color: var(--fg2); font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+.commitment-box p:last-child { margin-bottom: 0; }
+.commitment-box strong { color: var(--fg); }
+.commitment-box ul {
+  margin: 10px 0 12px 20px;
+  color: var(--fg2);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* ── Prototype data notice ── */
+.prototype-notice {
+  background: var(--warn-bg);
+  border: 1px solid rgba(200,130,0,0.20);
+  border-radius: 10px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 13.5px;
+  color: var(--warn);
+}
+.prototype-notice .n-icon { font-size: 18px; flex-shrink: 0; }
+.prototype-notice p { line-height: 1.6; }
+.prototype-notice strong { color: var(--warn); }
+.prototype-notice code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: rgba(200,130,0,0.12);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ── Blockers table ── */
+.blockers-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.blockers-card .card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px; font-weight: 600; color: var(--fg);
+  display: flex; align-items: center; gap: 8px;
+}
+table.blockers {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+table.blockers th {
+  padding: 9px 16px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg3);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+table.blockers td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg2);
+  vertical-align: top;
+}
+table.blockers tr:last-child td { border-bottom: none; }
+table.blockers td.b-metric { color: var(--fg); font-weight: 500; }
+.priority-crit {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+  background: rgba(200,40,40,0.10); color: #c02828;
+}
+.priority-high {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+  background: rgba(200,130,0,0.12); color: var(--warn);
+}
+.priority-med {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 4px;
+  background: var(--pending-bg); color: var(--pending);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .priority-crit { color: #f07070; background: rgba(200,40,40,0.15); }
+}
+:root[data-theme="dark"] .priority-crit { color: #f07070; background: rgba(200,40,40,0.15); }
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg3);
+  margin-top: 40px;
+}
+footer a { color: var(--fg3); }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  nav { padding: 0 16px; height: auto; padding-block: 10px; gap: 8px; }
+  .nav-brand { margin-right: 0; }
+  main { padding-inline: 16px; }
+  .identity-grid { grid-template-columns: 1fr 1fr; }
+  table.checklist, table.blockers { font-size: 12.5px; }
+  .page-header { padding: 20px 16px; }
+}
+</style>
 </head>
 <body>
 
 <nav>
-  <span class="nav-brand">Jalna Water Intelligence</span>
-  <a href="index.html">Overview</a>
-  <a href="mandala-talab.html" class="active">Mandala Talab</a>
-  <a href="water-security.html">Water Security</a>
-  <a href="domestic-water-supply.html">Domestic Supply</a>
-  <a href="water-equity.html">Water Equity</a>
+  <span class="nav-brand">🌊 Jalna Water Intelligence</span>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="rajegaon.html">Rajegaon</a>
+    <a href="mandala-talab.html" class="active">Mandala Talab</a>
+    <a href="methods.html">Data &amp; Methods</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()">☀ / ☾</button>
+  </div>
 </nav>
 
-<header class="site-header">
-  <div>
-    <div class="hdr-title">
-      <h1>Mandala Talab — Jalna District</h1>
-      <p>Local reservoir · Marathwada · Satellite-derived monitoring · Dummy data prototype</p>
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Mandala Talab Reservoir</h1>
+    <div class="page-subtitle">
+      <span>Jalna District · Maharashtra</span>
+      <span class="page-badge"><span class="badge-dot"></span>Evaluating</span>
+      <span>Integration status: Pending sensor deployment</span>
     </div>
   </div>
-  <div class="hdr-right">
-    <span class="status-pill">Critical Level</span>
-    <span class="hdr-ts">Sentinel-2 · Oct 2026</span>
-  </div>
-</header>
-
-<div class="page">
-
-  <div class="stats-row">
-    <div class="stat-card c-level">
-      <div class="stat-lbl">Current Water Level</div>
-      <div class="stat-val">11%</div>
-      <div class="stat-note">of full-pool capacity</div>
-    </div>
-    <div class="stat-card c-area">
-      <div class="stat-lbl">Water Surface Area</div>
-      <div class="stat-val">0.4 km²</div>
-      <div class="stat-note">↓ from 2.1 km² (Oct 2025)</div>
-    </div>
-    <div class="stat-card c-dep">
-      <div class="stat-lbl">Population Dependent</div>
-      <div class="stat-val">~18K</div>
-      <div class="stat-note">across 6 nearby villages</div>
-    </div>
-    <div class="stat-card c-rain">
-      <div class="stat-lbl">Catchment Rainfall</div>
-      <div class="stat-val">−38%</div>
-      <div class="stat-note">below 2001–2020 mean</div>
-    </div>
-  </div>
-
-  <div class="main-grid">
-    <div class="map-card">
-      <div class="map-label">
-        Mandala Talab — Sentinel-2 Water Extent
-        <span>Lat 19.84°N · Lng 75.93°E · Jalna</span>
-      </div>
-      <div id="map"></div>
-      <div class="map-legend" id="mapLegend">
-        <span class="leg-label">Legend</span>
-        <span class="leg-item"><span class="leg-dot" style="background:#1872A8"></span>Oct 2025 extent</span>
-        <span class="leg-item"><span class="leg-dot" style="background:#C2321A"></span>Oct 2026 extent</span>
-        <span class="leg-item"><span class="leg-dot" style="background:#D4711A"></span>Dependent villages</span>
-      </div>
-    </div>
-
-    <div class="sidebar">
-      <div class="s-card">
-        <h3>Reservoir Profile</h3>
-        <div class="info-row"><span class="info-key">Talab type</span><span class="info-val">Check dam / tank</span></div>
-        <div class="info-row"><span class="info-key">Full-pool capacity</span><span class="info-val">1.8 MCM</span></div>
-        <div class="info-row"><span class="info-key">Catchment area</span><span class="info-val">38 km²</span></div>
-        <div class="info-row"><span class="info-key">Primary use</span><span class="info-val">Irrigation · Livestock</span></div>
-        <div class="info-row"><span class="info-key">Domestic use</span><span class="info-val">2 villages</span></div>
-        <div class="info-row"><span class="info-key">Last full</span><span class="info-val">Sep 2022</span></div>
-        <div class="info-row"><span class="info-key">Taluka</span><span class="info-val">Jalna (Urban)</span></div>
-      </div>
-      <div class="s-card alert-box">
-        <h3 style="color:var(--acc-crit)">⚠ Critical Alert</h3>
-        <p>At current depletion rate, Mandala Talab will reach <strong>dead storage</strong> by mid-November 2026. Six villages will require tanker supply. Last tanker deployment: Oct 3, 2026.</p>
-      </div>
-      <div class="s-card">
-        <h3>Satellite Data</h3>
-        <div class="info-row"><span class="info-key">Sensor</span><span class="info-val">Sentinel-2 MSI</span></div>
-        <div class="info-row"><span class="info-key">Method</span><span class="info-val">MNDWI threshold</span></div>
-        <div class="info-row"><span class="info-key">Resolution</span><span class="info-val">10 m pixel</span></div>
-        <div class="info-row"><span class="info-key">Revisit</span><span class="info-val">5-day repeat</span></div>
-        <div class="info-row"><span class="info-key">Cloud cover</span><span class="info-val">8% (last pass)</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="charts-row">
-    <div class="chart-card">
-      <div class="chart-title">Water Level — Monthly % Capacity</div>
-      <div class="chart-sub">2026 vs 2025 · Sentinel-2 surface area → storage estimate</div>
-      <div class="chart-wrap"><canvas id="levelChart"></canvas></div>
-      <div class="chart-legend">
-        <span class="cl-item"><span class="cl-swatch" style="background:#C2321A"></span>2026</span>
-        <span class="cl-item"><span class="cl-swatch" style="background:#1872A8;opacity:0.6"></span>2025 (ref)</span>
-      </div>
-      <div class="chart-src">Source: Sentinel-2 MNDWI · dummy data prototype</div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Water Surface Area (km²)</div>
-      <div class="chart-sub">Monthly pixel-count area · Oct 2025 → Oct 2026</div>
-      <div class="chart-wrap"><canvas id="areaChart"></canvas></div>
-      <div class="chart-src">Source: Google Dynamic World v1 · Sentinel-2 · dummy data prototype</div>
-    </div>
-  </div>
-
 </div>
 
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="ft-block"><strong>Data Sources</strong>Sentinel-2 MSI (ESA Copernicus) · Google Dynamic World v1 · IMD Rainfall · Maharashtra WRD · CWC</div>
-    <div class="ft-block"><strong>Methodology</strong>MNDWI water extent → bathymetric storage curve. Pixel-count first-order approximation via Google Earth Engine. All values are dummy data for prototype demonstration.</div>
-    <div class="ft-block"><strong>Produced by</strong>DSOC AI Research Lab · Western Kentucky University<br>dsocai.students@wku.edu</div>
+<main>
+
+  <div class="honesty-banner">
+    <span class="honesty-icon">ℹ</span>
+    <div>
+      <strong>Data integrity notice:</strong> No reservoir storage, fill level, or surface-area figures are shown on this page.
+      Mandala Talab has not yet been instrumented with verified sensors, and no scientific review of satellite-derived estimates has been completed.
+      Figures will appear here only after sign-off. See <a href="methods.html">Data &amp; Methods</a> for full provenance.
+    </div>
   </div>
+
+  <!-- Prototype data warning -->
+  <div class="prototype-notice">
+    <span class="n-icon">⚠</span>
+    <p>
+      <strong>Prototype demonstration values are excluded from this page.</strong>
+      Figures such as <code>7.10 ML</code> capacity, <code>4.82 ML</code> storage, and <code>67.9%</code> fill were arithmetic demonstrations
+      computed during system design — they are not verified sensor readings. They must not be presented as actual reservoir status on the public site.
+    </p>
+  </div>
+
+  <!-- Reservoir identity -->
+  <div class="section-title">Reservoir Identity</div>
+  <div class="identity-card">
+    <div class="identity-map-strip">
+      <div id="map"></div>
+    </div>
+    <div class="identity-body">
+      <div class="identity-grid">
+        <div class="id-field">
+          <label>Name</label>
+          <div class="id-value">Mandala Talab</div>
+        </div>
+        <div class="id-field">
+          <label>Type</label>
+          <div class="id-value">Minor reservoir / tank</div>
+        </div>
+        <div class="id-field">
+          <label>District</label>
+          <div class="id-value">Jalna, Maharashtra</div>
+        </div>
+        <div class="id-field">
+          <label>Approximate location</label>
+          <div class="id-value mono">19.844°N, 75.888°E</div>
+        </div>
+        <div class="id-field">
+          <label>SICCA monitoring status</label>
+          <div class="id-value">Pending sensor deployment <span class="tag tag-pend">Pending</span></div>
+        </div>
+        <div class="id-field">
+          <label>Reported capacity</label>
+          <div class="id-value">Not confirmed <span class="tag tag-pend">Pending</span></div>
+        </div>
+        <div class="id-field">
+          <label>Current storage</label>
+          <div class="id-value">Not measured <span class="tag tag-pend">Pending</span></div>
+        </div>
+        <div class="id-field">
+          <label>Satellite imagery</label>
+          <div class="id-value">Scene selection required <span class="tag tag-pend">Pending</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data readiness checklist -->
+  <div class="section-title">Data Readiness Checklist</div>
+  <div class="checklist-card">
+    <div class="checklist-header">
+      <h3>Metrics and their readiness for public display</h3>
+      <span class="readiness-count">0 of 6 ready</span>
+    </div>
+    <table class="checklist">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Metric</th>
+          <th>Evidence type</th>
+          <th>Status</th>
+          <th>Blocker</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Reservoir capacity (design)</td>
+          <td><span class="tag tag-off">Official</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Awaiting WRD official design document</td>
+        </tr>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Current storage volume</td>
+          <td><span class="tag tag-pend">Observed</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Level sensor not yet installed and calibrated</td>
+        </tr>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Fill percentage</td>
+          <td><span class="tag tag-pend">Derived</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Requires confirmed capacity + live storage reading</td>
+        </tr>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Water surface area (satellite)</td>
+          <td><span class="tag tag-pend">Modelled</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Scene selection, cloud QA, and scientific review not completed</td>
+        </tr>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Inflow / outflow</td>
+          <td><span class="tag tag-pend">Observed</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Flow meter not installed</td>
+        </tr>
+        <tr>
+          <td><span class="row-icon">🔵</span></td>
+          <td class="metric-name">Seasonal trend (time series)</td>
+          <td><span class="tag tag-pend">Observed</span></td>
+          <td><span class="status-pending">Pending</span></td>
+          <td>Requires ≥ 30 days of validated level data</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- What will appear and when -->
+  <div class="section-title">What Appears Here and When</div>
+  <div class="commitment-box">
+    <p>
+      <strong>This page shows reservoir identity only.</strong>
+      Storage figures, fill percentage, surface-area estimates, and seasonal charts
+      will be added only after each metric passes the following gate:
+    </p>
+    <ul>
+      <li>The data source is identified and its provenance documented in <a href="methods.html">Data &amp; Methods</a>.</li>
+      <li>The evidence type (OBSERVED / OFFICIAL / ESTIMATED / MODELLED) is assigned and reviewed.</li>
+      <li>At least one independent reviewer has signed off the calculation or calibration.</li>
+      <li>The data honesty label and its definition are confirmed visible on the metric tile.</li>
+    </ul>
+    <p>
+      <strong>Demonstration values (7.10 ML capacity, 4.82 ML storage, 67.9% fill) will not appear.</strong>
+      These arithmetic figures were generated during prototype design to test the dashboard layout.
+      They are not sensor readings and have no scientific basis as a description of Mandala Talab's current state.
+    </p>
+    <p>
+      A satellite imagery layer will appear only after scene selection is complete, cloud cover is assessed,
+      water-area extraction is validated, and the resulting boundary is confirmed by a remote-sensing specialist.
+      A generic satellite tile or placeholder outline is not an acceptable substitute.
+    </p>
+  </div>
+
+  <!-- Blockers for go-live -->
+  <div class="section-title">Blockers for Metric Go-Live</div>
+  <div class="blockers-card">
+    <div class="card-header">
+      <span>🔒</span> Actions required before any Mandala Talab metric can be displayed
+    </div>
+    <table class="blockers">
+      <thead>
+        <tr>
+          <th>Priority</th>
+          <th>Metric</th>
+          <th>Required action</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="priority-crit">Critical</span></td>
+          <td class="b-metric">Current storage</td>
+          <td>Install, calibrate, and test level sensor; confirm telemetry to SICCA within ±5% accuracy</td>
+          <td>SICCA engineering</td>
+        </tr>
+        <tr>
+          <td><span class="priority-crit">Critical</span></td>
+          <td class="b-metric">Capacity (design)</td>
+          <td>Obtain and cite WRD official design-note or gazette reference for Mandala Talab</td>
+          <td>District Water Resources Dept.</td>
+        </tr>
+        <tr>
+          <td><span class="priority-high">High</span></td>
+          <td class="b-metric">Satellite water area</td>
+          <td>Select cloud-free Sentinel-2 or PlanetScope scenes; run NDWI extraction; peer review boundary shapefile</td>
+          <td>Remote sensing lead</td>
+        </tr>
+        <tr>
+          <td><span class="priority-high">High</span></td>
+          <td class="b-metric">Fill percentage</td>
+          <td>Confirm both capacity and live storage before this derived metric is calculated</td>
+          <td>SICCA + WRD</td>
+        </tr>
+        <tr>
+          <td><span class="priority-med">Medium</span></td>
+          <td class="b-metric">Inflow / outflow</td>
+          <td>Install flow meter at primary canal entry; validate against rain-gauge data</td>
+          <td>SICCA engineering</td>
+        </tr>
+        <tr>
+          <td><span class="priority-med">Medium</span></td>
+          <td class="b-metric">Seasonal trend</td>
+          <td>Accumulate ≥ 30 days of validated, gap-free level sensor data</td>
+          <td>Data operations</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer>
+  <div>Jalna Water Intelligence · Pilot: Rajegaon Village + Mandala Talab Reservoir</div>
+  <div style="margin-top:4px">Data honesty framework: every figure carries its evidence type (OBSERVED / OFFICIAL / ESTIMATED / MODELLED / UNAVAILABLE).</div>
+  <div style="margin-top:4px"><a href="methods.html">Data &amp; Methods</a> · <a href="index.html">Overview</a></div>
 </footer>
 
+<!-- Leaflet map -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-const map = L.map('map',{center:[19.835,75.930],zoom:13,scrollWheelZoom:false});
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution:'&copy; OpenStreetMap',maxZoom:18
+// ── Theme toggle ──
+function toggleTheme() {
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  if (cur === 'dark') root.setAttribute('data-theme', 'light');
+  else if (cur === 'light') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme', 'dark');
+}
+
+// ── Leaflet map — location point only ──
+// Mandala Talab approximate centroid; no invented water-extent polygons
+const LAT = 19.844, LNG = 75.888;
+
+const isDark = () =>
+  document.documentElement.getAttribute('data-theme') === 'dark' ||
+  (!document.documentElement.getAttribute('data-theme') &&
+   window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+function tileUrl() {
+  return isDark()
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+}
+
+const map = L.map('map', { zoomControl: true, attributionControl: true })
+  .setView([LAT, LNG], 13);
+
+let tileLayer = L.tileLayer(tileUrl(), {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 18
 }).addTo(map);
 
-const ext2025 = L.polygon([
-  [19.848,75.918],[19.852,75.928],[19.846,75.942],[19.838,75.946],
-  [19.828,75.942],[19.822,75.930],[19.826,75.918],[19.836,75.914]
-],{color:'#1872A8',weight:2,fillColor:'#1872A8',fillOpacity:0.35,dashArray:'6,3'}).addTo(map);
+// Single marker — location only; no storage or extent data
+const marker = L.circleMarker([LAT, LNG], {
+  radius: 9, color: '#1A5CA8', fillColor: '#3a8fdf',
+  fillOpacity: 0.7, weight: 2.5
+}).addTo(map).bindPopup(
+  '<strong>Mandala Talab</strong><br>Location reference only.<br>' +
+  'No sensor data available yet.'
+);
 
-const ext2026 = L.polygon([
-  [19.840,75.924],[19.842,75.928],[19.840,75.934],
-  [19.835,75.936],[19.831,75.932],[19.832,75.926]
-],{color:'#C2321A',weight:2,fillColor:'#C2321A',fillOpacity:0.5}).addTo(map);
+// Adjust tile when theme changes
+new MutationObserver(() => {
+  map.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(tileUrl(), {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 18
+  }).addTo(map);
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-const villages = [
-  {name:'Mandala (Sadar)',lat:19.845,lng:75.960,pop:4200},
-  {name:'Takli BK',lat:19.820,lng:75.955,pop:2800},
-  {name:'Dongaon',lat:19.808,lng:75.940,pop:3100},
-  {name:'Pimpalgaon T.',lat:19.818,lng:75.912,pop:2400},
-  {name:'Rui',lat:19.850,lng:75.910,pop:3600},
-  {name:'Sawangi',lat:19.862,lng:75.930,pop:1900},
-];
-villages.forEach(v=>{
-  const r = Math.max(5, Math.min(10, v.pop/500));
-  L.circleMarker([v.lat,v.lng],{radius:r,fillColor:'#D4711A',color:'#fff',weight:1.5,fillOpacity:0.75})
-   .bindPopup(`<strong>${v.name}</strong><br>Population: ${v.pop.toLocaleString()}<br><small>Dependent on Mandala Talab</small>`)
-   .addTo(map);
-});
-
-const isDark = window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
-const tc = {text:isDark?'#D4E8F4':'#0A1E2E',muted:isDark?'#5A88A4':'#3E5A6E',grid:isDark?'rgba(14,48,80,0.5)':'rgba(0,0,0,0.06)',card:isDark?'#0D1F30':'#fff'};
-
-const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
-const level26=[48,40,32,24,18,13,11,10,10,11];
-const level25=[72,65,58,52,46,40,55,68,75,74];
-
-new Chart(document.getElementById('levelChart'),{
-  type:'line',
-  data:{labels:MONTHS,datasets:[
-    {label:'2026',data:level26,borderColor:'#C2321A',backgroundColor:'rgba(194,50,26,0.1)',fill:true,borderWidth:2.5,tension:0.35,pointRadius:3.5,pointBackgroundColor:'#C2321A',pointBorderColor:tc.card,pointBorderWidth:1.5},
-    {label:'2025',data:level25,borderColor:'rgba(24,114,168,0.6)',borderDash:[5,3],borderWidth:1.8,fill:false,tension:0.35,pointRadius:2,pointBackgroundColor:'rgba(24,114,168,0.6)',pointBorderWidth:0}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:tc.card,titleColor:tc.text,bodyColor:tc.muted,borderColor:'#1872A8',borderWidth:1,padding:10,cornerRadius:6}},scales:{x:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11}}},y:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11},callback:v=>v+'%'},min:0,max:100}}}
-});
-
-const area26=[1.8,1.5,1.2,0.9,0.65,0.5,0.42,0.38,0.36,0.40];
-new Chart(document.getElementById('areaChart'),{
-  type:'bar',
-  data:{labels:MONTHS,datasets:[
-    {label:'Water area (km²)',data:area26,backgroundColor:area26.map(v=>v<0.5?'rgba(194,50,26,0.75)':v<1.0?'rgba(212,113,26,0.75)':'rgba(24,114,168,0.75)'),borderRadius:3,borderSkipped:false}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:tc.card,titleColor:tc.text,bodyColor:tc.muted,borderColor:'#1872A8',borderWidth:1,padding:10,cornerRadius:6}},scales:{x:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11}}},y:{grid:{color:tc.grid},border:{display:false},ticks:{color:tc.muted,font:{size:11},callback:v=>v+' km²'},min:0,max:2.5}}}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  map.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(tileUrl(), {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 18
+  }).addTo(map);
 });
 </script>
 </body>
