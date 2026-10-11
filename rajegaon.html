@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rajegaon Operations — Jalna Water Intelligence</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f5f4f1;
+    --surface: #ffffff;
+    --surface2: #eeecea;
+    --fg: #18160f;
+    --fg2: #48443a;
+    --fg3: #7a7570;
+    --border: #dedad4;
+    --accent: #1A7840;
+    --accent2: #2C9450;
+    --nav-bg: #111820;
+    --nav-fg: #e8e4e0;
+    --ok: #2C8450;
+    --warn: #C4801A;
+    --critical: #C2321A;
+    --blue: #1A5CA8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12110e;
+      --surface: #1c1a16;
+      --surface2: #242220;
+      --fg: #f0ece6;
+      --fg2: #c0b8ae;
+      --fg3: #7a7068;
+      --border: #2e2c28;
+      --accent: #3CB860;
+      --accent2: #50CC74;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12110e;
+    --surface: #1c1a16;
+    --surface2: #242220;
+    --fg: #f0ece6;
+    --fg2: #c0b8ae;
+    --fg3: #7a7068;
+    --border: #2e2c28;
+    --accent: #3CB860;
+    --accent2: #50CC74;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  nav {
+    background: var(--nav-bg);
+    color: var(--nav-fg);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    overflow-x: auto;
+    gap: 0;
+  }
+  .nav-brand { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--nav-fg); white-space: nowrap; margin-right: 24px; flex-shrink: 0; }
+  nav a { color: rgba(232,228,224,0.60); text-decoration: none; font-size: 13px; padding: 0 14px; height: 52px; display: flex; align-items: center; white-space: nowrap; transition: color 0.15s; border-bottom: 2px solid transparent; flex-shrink: 0; }
+  nav a:hover { color: var(--nav-fg); }
+  nav a.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+  .page-header {
+    background: #0e1f14;
+    color: #fff;
+    padding: 26px 32px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .page-header p { font-size: 13px; opacity: 0.72; }
+  .header-meta { font-size: 12px; color: rgba(255,255,255,0.55); text-align: right; }
+  .header-meta strong { color: rgba(255,255,255,0.85); display: block; }
+
+  /* CAVEAT BANNER */
+  .caveat-banner {
+    background: rgba(168,104,32,0.12);
+    border-bottom: 2px solid rgba(168,104,32,0.30);
+    padding: 10px 32px;
+    font-size: 12px;
+    color: #7a5010;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    line-height: 1.5;
+  }
+  @media (prefers-color-scheme: dark) { .caveat-banner { color: #d4a060; } }
+  .caveat-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+
+  /* STAT CARDS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 900px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 520px) { .stat-grid { grid-template-columns: 1fr; } }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+  }
+  .stat-card.warn::before { background: var(--warn); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.grey::before { background: var(--fg3); }
+  .stat-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg3); margin-bottom: 6px; }
+  .stat-value { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 500; color: var(--fg); line-height: 1; font-variant-numeric: tabular-nums; }
+  .stat-unit { font-size: 12px; font-weight: 400; color: var(--fg3); }
+  .stat-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-top: 6px;
+    text-transform: uppercase;
+  }
+  .tag-obs { background: rgba(26,120,64,0.12); color: #1a7840; }
+  .tag-est { background: rgba(168,104,32,0.14); color: #a86820; }
+  .tag-pend { background: rgba(96,96,96,0.10); color: var(--fg3); }
+  .tag-off { background: rgba(26,92,168,0.10); color: #1a5ca8; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg3);
+    margin-bottom: 12px;
+    margin-top: 28px;
+  }
+
+  /* OHT CARD */
+  .oht-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 700px) { .oht-card { grid-template-columns: 1fr; } }
+  .oht-state-box {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 14px 18px;
+    text-align: center;
+  }
+  .oht-state-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--fg3); margin-bottom: 8px; font-weight: 500; }
+  .oht-state-val { font-size: 15px; font-weight: 600; color: var(--fg3); font-style: italic; }
+  .oht-note { font-size: 12px; color: var(--fg3); line-height: 1.5; grid-column: 1 / -1; padding-top: 4px; }
+
+  /* CHARTS ROW */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 800px) { .charts-row { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .chart-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+  }
+  .chart-sub { font-size: 11px; color: var(--fg3); margin-bottom: 14px; }
+  .chart-wrap { position: relative; height: 260px; }
+
+  /* TABLE */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .table-card h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--fg3);
+    margin-bottom: 4px;
+  }
+  .table-sub { font-size: 11px; color: var(--fg3); margin-bottom: 14px; }
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+  thead th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--fg3);
+    border-bottom: 1px solid var(--border);
+    padding: 5px 8px 9px;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 9px 8px; color: var(--fg2); vertical-align: middle; }
+  tbody td:first-child { color: var(--fg); font-weight: 500; }
+  .num { font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+  .total-row td { border-top: 2px solid var(--border); color: var(--fg); font-weight: 600; }
+
+  .status-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .pill-above { background: rgba(44,132,80,0.12); color: #1a7840; }
+  .pill-below { background: rgba(196,128,26,0.12); color: #9a6010; }
+
+  /* FLOW ASSUMPTION BOX */
+  .assumption-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--fg3);
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  .assumption-box strong { color: var(--fg2); }
+
+  footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--fg3);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">Jalna Water Intelligence</span>
+  <a href="index.html">Overview</a>
+  <a href="rajegaon.html" class="active">Rajegaon</a>
+  <a href="mandala-talab.html">Mandala Talab</a>
+  <a href="methods.html">Data &amp; Methods</a>
+</nav>
+
+<div class="page-header">
+  <div>
+    <h1>Rajegaon — Distribution Operations</h1>
+    <p>IoT-connected village · Gravity distribution · Jalna Taluka, Maharashtra</p>
+  </div>
+  <div class="header-meta">
+    <strong>Record period: 03 Jul – 28 Sep 2026</strong>
+    Controller ON-command telemetry via SICCA · 88 calendar days
+  </div>
+</div>
+
+<div class="caveat-banner">
+  <span class="caveat-icon">⚠</span>
+  <span><strong>Volume and LPCD figures are ESTIMATED, not metered.</strong> They are computed from controller valve-command ON time × an assumed constant 1,000 L/min flow rate at every valve. Actual delivered water has not been measured. Simultaneous zone openings may not produce additive flow. Labels throughout this page reflect this limitation.</span>
+</div>
+
+<main>
+
+  <!-- SUMMARY KPIs -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total valve ON time</div>
+      <div class="stat-value">198.2<span class="stat-unit"> hrs</span></div>
+      <div><span class="stat-tag tag-obs">Observed</span></div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-label">Est. village LPCD</div>
+      <div class="stat-value">52.5<span class="stat-unit"> L/p/d</span></div>
+      <div><span class="stat-tag tag-est">Estimated</span></div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Population (zone form)</div>
+      <div class="stat-value">2,574</div>
+      <div><span class="stat-tag tag-off">Official</span></div>
+    </div>
+    <div class="stat-card grey">
+      <div class="stat-label">Water Equity Index</div>
+      <div class="stat-value" style="font-size:13px;margin-top:6px;color:var(--fg3);">Not calculable</div>
+      <div><span class="stat-tag tag-pend">Missing: reliability data</span></div>
+    </div>
+  </div>
+
+  <!-- OHT STATE -->
+  <div class="section-label">OHT (Overhead Tank) — Discrete State</div>
+  <div class="oht-card">
+    <div class="oht-state-box">
+      <div class="oht-state-label">Current state</div>
+      <div class="oht-state-val">Data required</div>
+      <div style="margin-top:6px;"><span class="stat-tag tag-pend">Pending probe verification</span></div>
+    </div>
+    <div class="oht-state-box">
+      <div class="oht-state-label">Nominal capacity</div>
+      <div class="oht-state-val">100,000 L</div>
+      <div style="margin-top:6px;"><span class="stat-tag tag-off">Nominal</span></div>
+    </div>
+    <div class="oht-state-box">
+      <div class="oht-state-label">Probe levels</div>
+      <div class="oht-state-val">~50,000 L / ~100,000 L</div>
+      <div style="margin-top:6px;"><span class="stat-tag tag-pend">Truth table pending</span></div>
+    </div>
+    <div class="oht-note">
+      The OHT has two discrete probes at approximately 50,000 L (lower) and 100,000 L (upper). Valid states are: <strong>Below lower</strong>, <strong>Between probes</strong>, <strong>At / above upper</strong>, <strong>Inconsistent</strong>, or <strong>Unknown / stale</strong>. A continuous percentage such as "73%" is not supported by this sensor configuration and will not be displayed. Probe wiring logic and electronic truth table require field-team sign-off before any level state is shown.
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="section-label">Zone-Level Distribution — Estimated (88-day record)</div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Estimated LPCD by Zone</h3>
+      <div class="chart-sub">Controller ON time × 1,000 L/min assumed · Rural benchmark 55 LPCD (BIS IS 10500) · ESTIMATED — not metered</div>
+      <div class="chart-wrap"><canvas id="lpcdChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Valve ON Hours</h3>
+      <div class="chart-sub">OBSERVED controller command hours per zone · 03 Jul–28 Sep 2026</div>
+      <div class="chart-wrap"><canvas id="hoursChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ASSUMPTION BOX -->
+  <div class="assumption-box">
+    <strong>Flow assumption:</strong> 1,000 L/min constant at every valve (not calibrated; not measured). This assumption is editable by an authorised administrator and must be explicitly versioned. Relative zone ratios are only comparable if every valve has the same actual flow rate when open — this has not been confirmed. <strong>Concurrent zone openings</strong> may reduce individual zone flow below 1,000 L/min if the total available head is constrained.
+  </div>
+
+  <!-- ZONE TABLE -->
+  <div class="table-card">
+    <h2>Zone-by-Zone Operations Scorecard</h2>
+    <div class="table-sub">Plot mapping confirmed from SICCA app screenshot (11 Oct 2026) + zone form · All volume/LPCD figures = ESTIMATED · Population from undated zone form</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Zone</th>
+            <th>Locality</th>
+            <th>Valve ID</th>
+            <th>Plot #</th>
+            <th>Households</th>
+            <th>People</th>
+            <th>ON hrs <span style="font-weight:400;font-style:italic">(obs)</span></th>
+            <th>Est. L/day <span style="font-weight:400;font-style:italic">(est)</span></th>
+            <th>Est. LPCD <span style="font-weight:400;font-style:italic">(est)</span></th>
+            <th>vs 55 LPCD</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>A1</td><td>मंदिर</td><td class="num">VA0250/1</td><td class="num">2</td>
+            <td class="num">50</td><td class="num">250</td>
+            <td class="num">14.60</td><td class="num">9,952</td><td class="num">39.8</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>A2</td><td>सपाटे</td><td class="num">VA0250/2</td><td class="num">3</td>
+            <td class="num">55</td><td class="num">275</td>
+            <td class="num">14.03</td><td class="num">9,564</td><td class="num">34.8</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>A3</td><td>भरत</td><td class="num">VA0249/2</td><td class="num">4</td>
+            <td class="num">52</td><td class="num">260</td>
+            <td class="num">15.92</td><td class="num">10,856</td><td class="num">41.8</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>A4</td><td>घायतडक</td><td class="num">VA0250/3</td><td class="num">5</td>
+            <td class="num">48</td><td class="num">240</td>
+            <td class="num">33.12</td><td class="num">22,580</td><td class="num">94.1</td>
+            <td><span class="status-pill pill-above">At/above ref.</span></td>
+          </tr>
+          <tr>
+            <td>A5</td><td>लक्ष्मण</td><td class="num">VA0249/1</td><td class="num">6</td>
+            <td class="num">44</td><td class="num">220</td>
+            <td class="num">13.98</td><td class="num">9,534</td><td class="num">43.3</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>B1</td><td>गज्जू बाबा</td><td class="num">VA0251/2</td><td class="num">7</td>
+            <td class="num">50</td><td class="num">244</td>
+            <td class="num">33.76</td><td class="num">23,021</td><td class="num">94.3</td>
+            <td><span class="status-pill pill-above">At/above ref.</span></td>
+          </tr>
+          <tr>
+            <td>B2</td><td>तुकाराम</td><td class="num">VA0251/3</td><td class="num">8</td>
+            <td class="num">54</td><td class="num">270</td>
+            <td class="num">20.28</td><td class="num">13,826</td><td class="num">51.2</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>B3</td><td>कैलास बाबा</td><td class="num">VA0251/1</td><td class="num">9</td>
+            <td class="num">60</td><td class="num">300</td>
+            <td class="num">23.59</td><td class="num">16,086</td><td class="num">53.6</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>C1</td><td>किशोर</td><td class="num">VA0252/1</td><td class="num">10</td>
+            <td class="num">56</td><td class="num">280</td>
+            <td class="num">16.99</td><td class="num">11,585</td><td class="num">41.4</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr>
+            <td>C2</td><td>बंडू भाऊ</td><td class="num">VA0252/2</td><td class="num">11</td>
+            <td class="num">47</td><td class="num">235</td>
+            <td class="num">11.88</td><td class="num">8,103</td><td class="num">34.5</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="4">Village Total</td>
+            <td class="num">516</td>
+            <td class="num">2,574</td>
+            <td class="num">198.16</td>
+            <td class="num">135,108</td>
+            <td class="num">52.5</td>
+            <td><span class="status-pill pill-below">Below ref.</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PENDING VALIDATIONS -->
+  <div class="section-label">Pending Validations — Required Before Official Use</div>
+  <div class="table-card" style="margin-bottom:0;">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Check required</th>
+            <th>Who validates</th>
+            <th>Status</th>
+            <th>What it unlocks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--critical)">Critical</strong></td>
+            <td>Verify plot ON = actual valve opening vs. only command</td>
+            <td>Controller acknowledgements + site checks</td>
+            <td><span class="stat-tag tag-pend">Pending</span></td>
+            <td>Meaning of supply time</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--critical)">Critical</strong></td>
+            <td>Measure actual flow per zone (or per operating configuration)</td>
+            <td>Portable ultrasonic meter / calibrated install</td>
+            <td><span class="stat-tag tag-pend">Pending</span></td>
+            <td>Defensible zone-specific LPCD</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--warn)">High</strong></td>
+            <td>Confirm concurrent valve operation and total inlet flow constraint</td>
+            <td>Controller event logs + hydraulics</td>
+            <td><span class="stat-tag tag-pend">Pending</span></td>
+            <td>Avoid double-counting estimated litres</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--warn)">High</strong></td>
+            <td>Validate zone households and people (2,574 vs. prior 2,266 projection)</td>
+            <td>Water supplier / GP; dated and signed roster</td>
+            <td><span class="stat-tag tag-pend">Pending</span></td>
+            <td>Approved equity denominator</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--warn)">High</strong></td>
+            <td>Obtain programmed supply schedule and exception logs</td>
+            <td>SICCA scheduler + completion acknowledgements</td>
+            <td><span class="stat-tag tag-pend">Pending</span></td>
+            <td>Schedule-command adherence metric</td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--warn)">High</strong></td>
+            <td>OHT probe truth table and wiring confirmation</td>
+            <td>Waterfall field team</td>
+            <td><span class="stat-tag tag-pend">Pending</span></div>
+            <td>Discrete OHT state display</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <span>DSOC AI Research Lab · Western Kentucky University · dsocai.students@wku.edu</span>
+    <span>All volume/LPCD = ESTMATED · Data &amp; Methods: <a href="methods.html" style="color:var(--accent)">methods.html</a></span>
+  </footer>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const isDark = () =>
+  document.documentElement.dataset.theme === 'dark' ||
+  (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+function gridColor() { return isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'; }
+function textColor() { return isDark() ? '#7a7068' : '#7a7570'; }
+function fgColor() { return isDark() ? '#c0b8ae' : '#48443a'; }
+
+const ZONES = ['A1 मंदिर','A2 सपाटे','A3 भरत','A4 घायतडक','A5 लक्ष्मण','B1 गज्जू बाबा','B2 तुकाराम','B3 कैलास बाबा','C1 किशोर','C2 बंडू भाऊ'];
+const LPCD  = [39.8, 34.8, 41.8, 94.1, 43.3, 94.3, 51.2, 53.6, 41.4, 34.5];
+const HOURS = [14.60, 14.03, 15.92, 33.12, 13.98, 33.76, 20.28, 23.59, 16.99, 11.88];
+const BENCHMARK = 55;
+const WARN = '#C4801A';
+const OK   = '#2C8450';
+const CRIT = '#C2321A';
+const GREY = '#888';
+
+const lpcdColors = LPCD.map(v => v >= BENCHMARK ? OK : (v >= 40 ? WARN : CRIT));
+
+// LPCD chart
+new Chart(document.getElementById('lpcdChart'), {
+  type: 'bar',
+  data: {
+    labels: ZONES,
+    datasets: [
+      {
+        label: 'Est. LPCD',
+        data: LPCD,
+        backgroundColor: lpcdColors,
+        borderRadius: 4,
+        borderSkipped: false,
+      },
+      {
+        label: 'Rural benchmark (55 LPCD)',
+        data: Array(10).fill(BENCHMARK),
+        type: 'line',
+        borderColor: '#1A5CA8',
+        borderWidth: 2,
+        borderDash: [5,4],
+        pointRadius: 0,
+        fill: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: fgColor(), font: { family: 'IBM Plex Sans', size: 11 }, boxWidth: 12, padding: 12 } },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.datasetIndex === 0
+            ? `${ctx.parsed.y.toFixed(1)} LPCD — ESTIMATED (1,000 L/min assumed)`
+            : `Rural benchmark: ${ctx.parsed.y} LPCD`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { size: 10 }, maxRotation: 35 } },
+      y: {
+        grid: { color: gridColor() },
+        ticks: { color: textColor(), font: { family: 'IBM Plex Mono', size: 11 } },
+        title: { display: true, text: 'LPCD (estimated)', color: textColor(), font: { size: 11 } },
+        min: 0, max: 110
+      }
+    }
+  }
+});
+
+// Hours chart
+new Chart(document.getElementById('hoursChart'), {
+  type: 'bar',
+  data: {
+    labels: ZONES,
+    datasets: [{
+      label: 'Valve ON hrs (observed)',
+      data: HOURS,
+      backgroundColor: '#1A7840
+      borderRadius: 4,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `${ctx.parsed.x.toFixed(2)} hrs ℔ OBSERVED controller command` } }
+    },
+    scales: {
+      x: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { family: 'IBM Plex Mono', size: 11 } }, title: { display: true, text: 'Hours', color: textColor(), font: { size: 11 } }, min: 0 },
+      y: { grid: { color: gridColor() }, ticks: { color: textColor(), font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>
