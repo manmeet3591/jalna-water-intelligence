@@ -8,48 +8,46 @@
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
   :root {
-    --bg: #f5f4f0;
+    --bg: #f5f4f1;
     --surface: #ffffff;
-    --surface2: #edeae4;
-    --fg: #1a1612;
-    --fg2: #4a4540;
+    --surface2: #eeecea;
+    --fg: #18160f;
+    --fg2: #48443a;
     --fg3: #7a7570;
     --border: #dedad4;
-    --accent: #1A5CA8;
-    --accent2: #2A7CC8;
-    --accent-light: #e6eff8;
-    --critical: #C2321A;
-    --warning: #C4801A;
-    --ok: #2C8450;
+    --accent: #1A7840;
+    --accent2: #2C9450;
     --nav-bg: #111820;
-    --nav-fg: #e8eef4;
+    --nav-fg: #e8e4e0;
+    --ok: #2C8450;
+    --warn: #C4801A;
+    --critical: #C2321A;
+    --blue: #1A5CA8;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #10141a;
-      --surface: #181e26;
-      --surface2: #1e2530;
-      --fg: #e8eef4;
-      --fg2: #a8b8c8;
-      --fg3: #688090;
-      --border: #283040;
-      --accent: #4080D0;
-      --accent2: #60A0F0;
-      --accent-light: #1a2a3a;
+      --bg: #12110e;
+      --surface: #1c1a16;
+      --surface2: #242220;
+      --fg: #f0ece6;
+      --fg2: #c0b8ae;
+      --fg3: #7a7068;
+      --border: #2e2c28;
+      --accent: #3CB860;
+      --accent2: #50CC74;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #10141a;
-    --surface: #181e26;
-    --surface2: #1e2530;
-    --fg: #e8eef4;
-    --fg2: #a8b8c8;
-    --fg3: #688090;
-    --border: #283040;
-    --accent: #4080D0;
-    --accent2: #60A0F0;
-    --accent-light: #1a2a3a;
+    --bg: #12110e;
+    --surface: #1c1a16;
+    --surface2: #242220;
+    --fg: #f0ece6;
+    --fg2: #c0b8ae;
+    --fg3: #7a7068;
+    --border: #2e2c28;
+    --accent: #3CB860;
+    --accent2: #50CC74;
     color-scheme: dark;
   }
 
@@ -75,287 +73,132 @@
     overflow-x: auto;
     gap: 0;
   }
-  .nav-brand {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--nav-fg);
-    white-space: nowrap;
-    margin-right: 24px;
-    flex-shrink: 0;
-  }
-  nav a {
-    color: rgba(232,238,244,0.60);
-    text-decoration: none;
-    font-size: 13px;
-    padding: 0 14px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    transition: color 0.15s;
-    border-bottom: 2px solid transparent;
-  }
+  .nav-brand { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--nav-fg); white-space: nowrap; margin-right: 24px; flex-shrink: 0; }
+  nav a { color: rgba(232,228,224,0.60); text-decoration: none; font-size: 13px; padding: 0 14px; height: 52px; display: flex; align-items: center; white-space: nowrap; transition: color 0.15s; border-bottom: 2px solid transparent; flex-shrink: 0; }
   nav a:hover { color: var(--nav-fg); }
   nav a.active { color: var(--accent2); border-bottom-color: var(--accent2); }
 
-  .hero {
-    background: var(--nav-bg);
-    color: var(--nav-fg);
-    padding: 56px 32px 48px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .hero-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--accent2);
-    margin-bottom: 14px;
-  }
-  .hero h1 {
-    font-size: 36px;
-    font-weight: 600;
-    line-height: 1.15;
-    margin-bottom: 14px;
-    text-wrap: balance;
-    max-width: 640px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .hero p {
-    font-size: 16px;
-    font-weight: 300;
-    color: rgba(232,238,244,0.72);
-    max-width: 560px;
-    margin: 0 auto 24px;
-    text-wrap: balance;
-  }
-  .hero-meta {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    font-size: 12px;
-    color: rgba(232,238,244,0.45);
-    letter-spacing: 0.04em;
-  }
-  .hero-meta span::before { content: '◆ '; color: var(--accent2); }
+  .page-wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px; }
 
-  .alert-band {
-    background: rgba(194,50,26,0.92);
-    color: #fff;
-    padding: 12px 32px;
+  .scope-banner {
+    background: rgba(26,92,168,0.08);
+    border: 1px solid rgba(26,92,168,0.20);
+    border-radius: 6px;
+    padding: 12px 16px;
     font-size: 13px;
-    font-weight: 500;
-    text-align: center;
+    color: var(--fg2);
+    margin-bottom: 28px;
+    line-height: 1.6;
   }
-  .alert-band strong { font-weight: 700; }
+  .scope-banner strong { color: var(--fg); }
 
-  .kpi-strip {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-  }
-  @media (max-width: 900px) { .kpi-strip { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 520px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
-  .kpi {
-    padding: 20px 22px;
-    border-right: 1px solid var(--border);
-    text-align: center;
-  }
-  .kpi:last-child { border-right: none; }
-  .kpi-val {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 26px;
-    font-weight: 500;
-    line-height: 1;
-    color: var(--fg);
-    margin-bottom: 4px;
-    font-variant-numeric: tabular-nums;
-  }
-  .kpi-label { font-size: 11px; color: var(--fg3); text-transform: uppercase; letter-spacing: 0.06em; }
-  .kpi-delta {
-    font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace;
-    margin-top: 4px;
-    color: var(--critical);
-  }
-  .kpi-delta.pos { color: var(--ok); }
-
-  .section-header {
-    padding: 36px 32px 8px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  .section-header h2 {
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--fg3);
-    margin-bottom: 4px;
-  }
-  .section-header p { font-size: 14px; color: var(--fg2); }
-
-  .dashboard-grid {
+  .entity-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    padding: 16px 32px 36px;
-    max-width: 1200px;
-    margin: 0 auto;
+    margin-bottom: 36px;
   }
-  @media (max-width: 700px) { .dashboard-grid { grid-template-columns: 1fr; padding: 16px; } }
+  @media (max-width: 700px) { .entity-grid { grid-template-columns: 1fr; } }
 
-  .dash-card {
+  .entity-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     overflow: hidden;
+  }
+  .entity-card-header {
+    padding: 16px 20px;
     display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-    transition: box-shadow 0.18s, transform 0.15s;
-  }
-  .dash-card:hover {
-    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
-  }
-
-  .dash-card-header {
-    padding: 24px 24px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  .dash-card-tag {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tag-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dash-card h3 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--fg);
-  }
-  .dash-card p {
-    font-size: 13px;
-    color: var(--fg3);
-    line-height: 1.55;
-  }
-
-  .dash-card-body { padding: 20px 24px; flex: 1; }
-  .metric-list { display: flex; flex-direction: column; gap: 10px; }
-  .metric-row {
-    display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: baseline;
-    font-size: 13px;
-  }
-  .metric-name { color: var(--fg2); }
-  .metric-val {
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 500;
-    font-variant-numeric: tabular-nums;
-  }
-  .metric-val.bad { color: var(--critical); }
-  .metric-val.warn { color: var(--warning); }
-  .metric-val.good { color: var(--ok); }
-
-  .dash-card-footer {
-    padding: 14px 24px;
-    background: var(--surface2);
-    font-size: 12px;
-    color: var(--accent2);
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .mandala-card {
-    grid-column: 1 / -1;
-    background: linear-gradient(135deg, #0d2a40 0%, #1a4060 100%);
-    border: none;
-    color: #e8f2fa;
-  }
-  .mandala-card:hover { box-shadow: 0 6px 32px rgba(0,0,0,0.28); }
-  .mandala-card .dash-card-header { border-bottom-color: rgba(255,255,255,0.1); background: transparent; }
-  .mandala-card .dash-card-tag { color: #80C0E8; }
-  .mandala-card h3 { color: #e8f2fa; }
-  .mandala-card p { color: rgba(232,242,250,0.68); }
-  .mandala-card .dash-card-body { background: transparent; }
-  .mandala-card .dash-card-footer { background: rgba(0,0,0,0.25); color: #80C0E8; }
-  .mandala-card .metric-name { color: rgba(232,242,250,0.72); }
-  .mandala-card .metric-val { color: #e8f2fa; }
-  .mandala-card .metric-val.bad { color: #FF8070; }
-  .mandala-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-  @media (max-width: 600px) { .mandala-inner { grid-template-columns: 1fr; } }
-  .mandala-chart-area {
-    padding: 20px 24px;
-    border-right: 1px solid rgba(255,255,255,0.1);
-    display: flex;
-    flex-direction: column;
     gap: 12px;
   }
-  .m-bar-row { }
-  .m-bar-label { font-size: 12px; color: rgba(232,242,250,0.65); margin-bottom: 4px; display: flex; justify-content: space-between; }
-  .m-bar-track { height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; }
-  .m-bar-fill { height: 100%; border-radius: 5px; }
-  .mandala-metrics { padding: 20px 24px; }
-
-  .map-thumb {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 0 32px 36px;
-    max-width: calc(1200px - 64px);
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0;
-  }
-  .map-thumb-header {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
+  .entity-card-header.connected { border-left: 3px solid #1a7840; }
+  .entity-card-header.evaluating { border-left: 3px solid #1a5ca8; }
+  .entity-name { font-size: 16px; font-weight: 600; color: var(--fg); margin-bottom: 3px; }
+  .entity-sub { font-size: 12px; color: var(--fg3); }
+  .badge {
+    font-size: 11px;
     font-weight: 600;
-    color: var(--fg2);
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.03em;
+  }
+  .badge-connected { background: rgba(26,120,64,0.14); color: #1a7840; }
+  .badge-evaluating { background: rgba(26,92,168,0.12); color: #1a5ca8; }
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+  }
+  .metric-block {
+    background: var(--surface);
+    padding: 14px18px;
+  }
+  .metric-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--fg3); margin-bottom: 4px; }
+  .metric-value { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 500; color: var(--fg); line-height: 1; font-variant-numeric: tabular-nums; }
+  .metric-unit { font-size: 11px; color: var(--fg3); }
+  .metric-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-top: 5px;
+    display: inline-block;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+  }
+  .tag-obs { background: rgba(26,120,64,0.12); color: #1a7840; }
+  .tag-est { background: rgba(168,104,32,0.14); color: #a86820; }
+  .tag-pend { background: rgba(96,96,96,0.10); color: var(--fg3); }
+  .tag-off { background: rgba(26,92,168,0.10); color: #1a5ca8; }
+
+  .entity-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
     display: flex;
+    align-items: center;
     justify-content: space-between;
   }
-  #overview-map { height: 320px; }
+  .entity-footer a { font-size: 13px; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .entity-footer a:hover { text-decoration: underline; }
+  .last-updated { font-size: 11px; color: var(--fg3); }
+
+  .scope-table-wrap {
+    margin-bottom: 28px;
+  }
+  h2 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--fg3);
+    margin-bottom: 12px;
+  }
+  .tbl-wrap { overflow-x: auto; }
+  static-table, table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
+  th { text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--fg3); border-bottom: 1px solid var(--border); padding: 5px 8px 9px; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 8px 8px; color: var(--fg2); vertical-align: middle; }
+  td:first-child { color: var(--fg); font-weight: 500; }
 
   footer {
-    background: var(--nav-bg);
-    color: rgba(232,238,244,0.45);
-    padding: 28px 32px;
+    margin-top: 32px;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
     font-size: 12px;
+    color: var(--fg3);
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 8px;
+    gap: 8px;
   }
-  footer strong { color: rgba(232,238,244,0.72); }
 </style>
 </head>
 <body>
@@ -363,323 +206,105 @@
 <nav>
   <span class="nav-brand">Jalna Water Intelligence</span>
   <a href="index.html" class="active">Overview</a>
+  <a href="rajegaon.html">Rajegaon</a>
   <a href="mandala-talab.html">Mandala Talab</a>
-  <a href="water-security.html">Water Security</a>
-  <a href="domestic-water-supply.html">Domestic Supply</a>
-  <a href="water-equity.html">Water Equity</a>
+  <a href="methods.html">Data &amp; Methods</a>
 </nav>
 
-<div class="hero">
-  <div class="hero-eyebrow">Jalna District · Maharashtra · India</div>
-  <h1>Digital Water Infrastructure<br>and Intelligence Prototype</h1>
-  <p>Satellite-derived monitoring, equity analytics, and supply intelligence for Jalna District's water systems during the 2026 drought.</p>
-  <div class="hero-meta">
-    <span>Illustrative Prototype</span>
-    <span>Dummy Data</span>
-    <span>DSOC AI Research Lab, WKU</span>
-    <span>October 2026</span>
+<div class="page-wrap">
+
+  <div class="scope-banner">
+    <strong>Pilot scope:</strong> This site currently covers <strong>2 entities</strong>: Rajegaon IoT village (connected) and Mandala Talab reservoir (under evaluation). District-wide totals, other villages, and aggregate indicators will appear only when the underlying data is verified and available.
   </div>
-</div>
 
-<div class="alert-band">
-  <strong>⚠ Active Drought Alert:</strong> Maharashtra state drought declared May 2026 — Jalna District classified Severely Affected · 7 of 8 talukas under tanker supply
-</div>
+  <div class="entity-grid">
 
-<div class="kpi-strip">
-  <div class="kpi">
-    <div class="kpi-val">11%</div>
-    <div class="kpi-label">District Storage</div>
-    <div class="kpi-delta">↓ 48% vs 2025</div>
+    <!-- RAJEGAON -->
+    <div class="entity-card">
+      <div class="entity-card-header connected">
+        <div>
+          <div class="entity-name">Rajegaon</div>
+          <div class="entity-sub">IoT village • Jalna Taluka • Gravity distribution</div>
+        </div>
+        <span class="badge badge-connected">✓ CONNECTED</span>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-block">
+          <div class="metric-label">Valve ON time</div>
+          <div class="metric-value">198.2<span class="metric-unit"> hrs</span></div>
+          <span class="metric-tag tag-obs">OBSERVED</span>
+        </div>
+        <div class="metric-block">
+          <div class="metric-label">Est. LPCD</div>
+          <div class="metric-value">52.5<span class="metric-unit"> L/p/d</span></div>
+          <span class="metric-tag tag-est">ESTIMATED</span>
+        </div>
+        <div class="metric-block">
+          <div class="metric-label">Population</div>
+          <div class="metric-value">2,574</div>
+          <span class="metric-tag tag-off">OFFICIAL</span>
+        </div>
+      </div>
+      <div class="entity-footer">
+        <a href="rajegaon.html">View operations →</a>
+        <span class="last-updated">Data: 03 Jul – 28 Sep 2026</span>
+      </div>
+    </div>
+
+    <!-- MANDALA TALAB -->
+    <div class="entity-card">
+      <div class="entity-card-header evaluating">
+        <div>
+          <div class="entity-name">Mandala Talab</div>
+          <div class="entity-sub">Reservoir • Jalna Taluka • Satellite monitoring</div>
+        </div>
+        <span class="badge badge-evaluating">EVALUATING</span>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-block">
+          <div class="metric-label">Capacity</div>
+          <div class="metric-value" style="font-size:14px;color:var(--fg3);">Pending</div>
+          <span class="metric-tag tag-pend">UNAVAILABLE</span>
+        </div>
+        <div class="metric-block">
+          <div class="metric-label">Current storage</div>
+          <div class="metric-value" style="font-size:14px;color:var(--fg3);">Pending</div>
+          <span class="metric-tag tag-pend">UNAVAILABLE</span>
+        </div>
+        <div class="metric-block">
+          <div class="metric-label">Fill level</div>
+          <div class="metric-value" style="font-size:14px;color:var(--fg3);">Pending</div>
+          <span class="metric-tag tag-pend">UNAVAILABLE</span>
+        </div>
+      </div>
+      <div class="entity-footer">
+        <a href="mandala-talab.html">View reservoir profile →</a>
+        <span class="last-updated">Data pending sensor installation</span>
+      </div>
+    </div>
   </div>
-  <div class="kpi">
-    <div class="kpi-val">620</div>
-    <div class="kpi-label">m³/capita/yr</div>
-    <div class="kpi-delta">Scarcity zone</div>
+
+  <div class="scope-table-wrap">
+    <h2>Pilot Scope &amp; Exclusions</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Item</th><th>Status</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Rajegaon village (IoT)</td><td><span class="metric-tag tag-obs">INCLUDED</span></td><td>Live telemetry, from 3 Jul 2026</td></tr>
+          <tr><td>Mandala Talab reservoir</td><td><span class="metric-tag tag-pend">EVALUATING</span></td><td>Identity only, no measurements yet</td></tr>
+          <tr><td>Other villages (incl. district 95;)</td><td><span class="metric-tag" style="background:rgba(194,34,26,0.10);color:#9a1a10">ERCLUDED</span></td><td>Not connected; no verified data</td></tr>
+          <tr><td>District totals (water security / equity)</td><td><span class="metric-tag" style="background:rgba(194,34,26,0.10);color:#9a1a10">ERCLUDED</span></td><td>Insufficient coverage for aggregation</td></tr>
+          <tr><td>Water Equity Index (village)</td><td><span class="metric-tag tag-pend">NOT CALCULABLE </span></td><td>Reliability data not yet collected</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="kpi">
-    <div class="kpi-val">38</div>
-    <div class="kpi-label">Avg LPCD</div>
-    <div class="kpi-delta">↓ 29% from norm</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-val">0.58</div>
-    <div class="kpi-label">Water Gini</div>
-    <div class="kpi-delta">↑ 0.12 since 2022</div>
-  </div>
-  <div class="kpi">
-    <div class="kpi-val">3.4h</div>
-    <div class="kpi-label">Women Fetch/day</div>
-    <div class="kpi-delta">↑ 1.1h vs pre-drought</div>
-  </div>
-</div>
 
-<div class="section-header">
-  <h2>District Overview</h2>
-  <p>Jalna District, Marathwada region — 8 talukas, population ~1.96 million</p>
-</div>
-<div class="map-thumb">
-  <div class="map-thumb-header">
-    <span>Jalna District Water Infrastructure Map</span>
-    <span style="font-weight:400;color:var(--fg3);text-transform:none;letter-spacing:0">Illustrative locations</span>
-  </div>
-  <div id="overview-map"></div>
-</div>
-
-<div class="section-header">
-  <h2>Intelligence Modules</h2>
-  <p>Four thematic analyses across water security, supply, equity, and reservoir monitoring</p>
-</div>
-
-<div class="dashboard-grid">
-
-  <a class="dash-card mandala-card" href="mandala-talab.html">
-    <div class="dash-card-header">
-      <div class="dash-card-tag" style="color:#80C0E8">
-        <div class="tag-dot" style="background:#80C0E8"></div>
-        Reservoir · Sentinel-2 · ICESat-2
-      </div>
-      <h3>Mandala Talab</h3>
-      <p>Dedicated satellite intelligence for Mandala Talab reservoir — Jalna district's key local storage body serving ~18,000 people across 6 villages. Current status: critical.</p>
-    </div>
-    <div class="mandala-inner">
-      <div class="mandala-chart-area">
-        <div class="m-bar-row">
-          <div class="m-bar-label"><span>Water level</span><span>11% capacity</span></div>
-          <div class="m-bar-track"><div class="m-bar-fill" style="width:11%;background:linear-gradient(90deg,#C2321A,#C4501A)"></div></div>
-        </div>
-        <div class="m-bar-row">
-          <div class="m-bar-label"><span>Surface area vs full pool</span><span>0.4 km² / 2.8 km²</span></div>
-          <div class="m-bar-track"><div class="m-bar-fill" style="width:14%;background:linear-gradient(90deg,#C2321A,#C47020)"></div></div>
-        </div>
-        <div class="m-bar-row">
-          <div class="m-bar-label"><span>Catchment rainfall vs normal</span><span>−38%</span></div>
-          <div class="m-bar-track"><div class="m-bar-fill" style="width:62%;background:linear-gradient(90deg,#1872A8,#20A0C8)"></div></div>
-        </div>
-        <div class="m-bar-row">
-          <div class="m-bar-label"><span>Days to dead storage</span><span>~35 days</span></div>
-          <div class="m-bar-track"><div class="m-bar-fill" style="width:9%;background:#C2321A"></div></div>
-        </div>
-      </div>
-      <div class="mandala-metrics">
-        <div class="metric-list">
-          <div class="metric-row">
-            <span class="metric-name">Reservoir status</span>
-            <span class="metric-val bad">CRITICAL</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">Dependent population</span>
-            <span class="metric-val">~18,000</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">Elevation drop (ICESat-2)</span>
-            <span class="metric-val bad">−6.1 m</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">Water extent loss (Sentinel-2)</span>
-            <span class="metric-val bad">−85%</span>
-          </div>
-          <div class="metric-row">
-            <span class="metric-name">Villages on tanker supply</span>
-            <span class="metric-val">5 / 6</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="dash-card-footer">
-      <span>View Mandala Talab Dashboard →</span>
-      <span>Sentinel-2 · ICESat-2 ATL13</span>
-    </div>
-  </a>
-
-  <a class="dash-card" href="water-security.html">
-    <div class="dash-card-header">
-      <div class="dash-card-tag" style="color:#C4521A">
-        <div class="tag-dot" style="background:#C4521A"></div>
-        Falkenmark Index · District-level
-      </div>
-      <h3>Water Security</h3>
-      <p>Per-capita availability, stress index, and seasonal scarcity patterns across Jalna's 8 talukas — benchmarked against Falkenmark thresholds.</p>
-    </div>
-    <div class="dash-card-body">
-      <div class="metric-list">
-        <div class="metric-row">
-          <span class="metric-name">Per-capita availability</span>
-          <span class="metric-val bad">620 m³/yr</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">WRI Stress index</span>
-          <span class="metric-val bad">4.1 / 5</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Months of scarcity</span>
-          <span class="metric-val warn">7.5 months</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Storage coverage</span>
-          <span class="metric-val bad">18 days</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Most stressed taluka</span>
-          <span class="metric-val bad">Mantha (4.8/5)</span>
-        </div>
-      </div>
-    </div>
-    <div class="dash-card-footer">
-      <span>View Water Security →</span>
-      <span>IMD · CWC · MODIS</span>
-    </div>
-  </a>
-
-  <a class="dash-card" href="domestic-water-supply.html">
-    <div class="dash-card-header">
-      <div class="dash-card-tag" style="color:#1A8878">
-        <div class="tag-dot" style="background:#1A8878"></div>
-        BIS IS 10500 · LPCD Norms
-      </div>
-      <h3>Domestic Water Supply</h3>
-      <p>Daily per-capita supply, piped coverage, tanker dependency, and water quality compliance across urban and rural populations.</p>
-    </div>
-    <div class="dash-card-body">
-      <div class="metric-list">
-        <div class="metric-row">
-          <span class="metric-name">Average daily supply</span>
-          <span class="metric-val warn">38 LPCD</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Piped connection coverage</span>
-          <span class="metric-val warn">54%</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Tanker-dependent population</span>
-          <span class="metric-val bad">28%</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Water quality compliance</span>
-          <span class="metric-val warn">62%</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Most critical taluka</span>
-          <span class="metric-val bad">Ghansawangi (21 LPCD)</span>
-        </div>
-      </div>
-    </div>
-    <div class="dash-card-footer">
-      <span>View Domestic Supply →</span>
-      <span>LPCD · BIS Norms · MJP Data</span>
-    </div>
-  </a>
-
-  <a class="dash-card" href="water-equity.html">
-    <div class="dash-card-header">
-      <div class="dash-card-tag" style="color:#7B32A8">
-        <div class="tag-dot" style="background:#7B32A8"></div>
-        Gini Index · Gender Burden
-      </div>
-      <h3>Water Equity</h3>
-      <p>Distributional analysis of water access across income quintiles, social categories, gender, and urban–rural divides — with Gini coefficient tracking.</p>
-    </div>
-    <div class="dash-card-body">
-      <div class="metric-list">
-        <div class="metric-row">
-          <span class="metric-name">Water Gini coefficient</span>
-          <span class="metric-val bad">0.58</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Poorest quintile access</span>
-          <span class="metric-val bad">19 LPCD</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Women fetch time</span>
-          <span class="metric-val bad">3.4 hrs/day</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">SC/ST avg access</span>
-          <span class="metric-val bad">18–24 LPCD</span>
-        </div>
-        <div class="metric-row">
-          <span class="metric-name">Villages without piped water</span>
-          <span class="metric-val bad">62%</span>
-        </div>
-      </div>
-    </div>
-    <div class="dash-card-footer">
-      <span>View Water Equity →</span>
-      <span>Gini · NFHS · Census</span>
-    </div>
-  </a>
+  <footer>
+    <span>DSOC AI Research Lab · Western Kentucky University · dsocai.students@wku.edu</span>
+    <span>V0.2 build – Data &amp; Methods: <a href="methods.html" style="color:var(--accent)">methods.html</a></span>
+  </footer>
 
 </div>
-
-<footer>
-  <div>
-    <strong>Jalna Water Intelligence</strong> · Digital water infrastructure and intelligence prototype for Jalna District<br>
-    DSOC AI Research Lab · Western Kentucky University · dsocai.students@wku.edu
-  </div>
-  <div style="text-align:right">
-    All data illustrative / dummy · Maharashtra 2026 Drought Context<br>
-    Powered by Sentinel-2 · MODIS · ICESat-2 ATL13 · Dynamic World
-  </div>
-</footer>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script>
-  const map = L.map('overview-map', { zoomControl: true, scrollWheelZoom: false }).setView([19.84, 75.88], 9);
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '© OpenStreetMap © CARTO',
-    subdomains: 'abcd', maxZoom: 18
-  }).addTo(map);
-
-  const talukas = [
-    { name: 'Jalna', lat: 19.84, lng: 75.88, gini: 0.44, lpcd: 48, status: 'moderate' },
-    { name: 'Ambad', lat: 19.61, lng: 75.73, gini: 0.66, lpcd: 32, status: 'high' },
-    { name: 'Badnapur', lat: 20.00, lng: 75.74, gini: 0.61, lpcd: 29, status: 'high' },
-    { name: 'Bhokardan', lat: 20.27, lng: 75.69, gini: 0.52, lpcd: 37, status: 'moderate' },
-    { name: 'Ghansawangi', lat: 19.63, lng: 75.98, gini: 0.68, lpcd: 21, status: 'high' },
-    { name: 'Jafrabad', lat: 19.87, lng: 76.10, gini: 0.57, lpcd: 33, status: 'moderate' },
-    { name: 'Mantha', lat: 19.40, lng: 76.13, gini: 0.71, lpcd: 18, status: 'high' },
-    { name: 'Partur', lat: 19.60, lng: 76.22, gini: 0.48, lpcd: 41, status: 'moderate' },
-  ];
-
-  const colorMap = { high: '#C2321A', moderate: '#C4801A', low: '#2C8450' };
-
-  talukas.forEach(t => {
-    const col = colorMap[t.status];
-    L.circleMarker([t.lat, t.lng], {
-      radius: 14,
-      color: col,
-      fillColor: col,
-      fillOpacity: 0.22,
-      weight: 2
-    }).bindPopup(`<strong>${t.name}</strong><br>Gini: ${t.gini} · LPCD: ${t.lpcd}<br>Equity: ${t.status.charAt(0).toUpperCase()+t.status.slice(1)} inequity`).addTo(map);
-
-    L.tooltip({ permanent: true, direction: 'top', offset: [0, -14], className: '' })
-      .setContent(`<span style="font-size:10px;font-weight:600;font-family:sans-serif">${t.name}</span>`)
-      .setLatLng([t.lat, t.lng])
-      .addTo(map);
-  });
-
-  L.circleMarker([19.835, 75.930], {
-    radius: 10,
-    color: '#1872A8',
-    fillColor: '#1872A8',
-    fillOpacity: 0.8,
-    weight: 2
-  }).bindPopup('<strong>Mandala Talab</strong><br>Level: 11% · Status: Critical').addTo(map);
-
-  const legend = L.control({ position: 'bottomright' });
-  legend.onAdd = () => {
-    const div = L.DomUtil.create('div');
-    div.style.cssText = 'background:white;padding:10px 14px;border-radius:6px;font-size:11px;font-family:sans-serif;border:1px solid #ddd';
-    div.innerHTML = `
-      <div style="font-weight:700;margin-bottom:6px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#444">Equity Level</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:10px;height:10px;border-radius:50%;background:#C2321A"></div> High Inequity</div>
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:10px;height:10px;border-radius:50%;background:#C4801A"></div> Moderate</div>
-      <div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:50%;background:#1872A8"></div> Mandala Talab</div>`;
-    return div;
-  };
-  legend.addTo(map);
-</script>
 </body>
 </html>
