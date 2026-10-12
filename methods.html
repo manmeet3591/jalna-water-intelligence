@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Data &amp; Methods — Jalna Water Intelligence</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ── Tokens ── */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --surface2: #f0f3f7;
+  --border: #d8dde6;
+  --fg: #111820;
+  --fg2: #3a4553;
+  --fg3: #6b7785;
+  --accent: #1A5CA8;
+  --accent-dim: rgba(26,92,168,0.08);
+  --pending: #6b7785;
+  --pending-bg: rgba(107,119,133,0.10);
+  --warn: #7a4f00;
+  --warn-bg: rgba(200,130,0,0.10);
+  --ok: #1a7840;
+  --ok-bg: rgba(26,120,64,0.10);
+  --header-bg: #111820;
+  --header-fg: #e8edf5;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --surface: #161c26; --surface2: #1c2433;
+    --border: #2a3548; --fg: #e4ecf5; --fg2: #a8b9ce; --fg3: #6b7e96;
+    --accent: #3a8fdf; --accent-dim: rgba(58,143,223,0.10);
+    --pending: #6b7e96; --pending-bg: rgba(107,126,150,0.12);
+    --warn: #c89040; --warn-bg: rgba(200,144,64,0.12);
+    --ok: #3ab870; --ok-bg: rgba(58,184,112,0.10);
+    --header-bg: #060c15; --header-fg: #c8d8ec; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --surface: #161c26; --surface2: #1c2433;
+  --border: #2a3548; --fg: #e4ecf5; --fg2: #a8b9ce; --fg3: #6b7e96;
+  --accent: #3a8fdf; --accent-dim: rgba(58,143,223,0.10);
+  --pending: #6b7e96; --pending-bg: rgba(107,126,150,0.12);
+  --warn: #c89040; --warn-bg: rgba(200,144,64,0.12);
+  --ok: #3ab870; --ok-bg: rgba(58,184,112,0.10);
+  --header-bg: #060c15; --header-fg: #c8d8ec; color-scheme: dark;
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  background: var(--bg); color: var(--fg);
+  font-size: 15px; line-height: 1.65;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1px 5px; border-radius: 4px;
+}
+
+/* ── Nav ── */
+nav {
+  background: var(--header-bg); color: var(--header-fg);
+  padding: 0 24px; display: flex; align-items: center;
+  gap: 0; height: 52px; position: sticky;
+  top: env(safe-area-inset-top, 0px); z-index: 100; flex-wrap: wrap;
+}
+.nav-brand { font-size: 15px; font-weight: 600; color: #fff; margin-right: 32px; white-space: nowrap; }
+.nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.nav-links a {
+  color: rgba(255,255,255,0.65); font-size: 13.5px; font-weight: 500;
+  padding: 6px 12px; border-radius: 6px; transition: color 0.15s, background 0.15s; text-decoration: none;
+}
+.nav-links a:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.nav-links a.active { color: #3a8fdf; background: rgba(58,143,223,0.12); }
+.nav-right { margin-left: auto; }
+.theme-btn {
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7); border-radius: 6px; padding: 4px 10px;
+  font-size: 12px; cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.theme-btn:hover { background: rgba(255,255,255,0.14); }
+
+/* ── Page header ── */
+.page-header {
+  background: var(--header-bg); border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 28px 24px 24px; color: var(--header-fg);
+}
+.page-header-inner { max-width: 900px; margin: 0 auto; }
+.page-header h1 { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-header p { font-size: 14px; color: rgba(255,255,255,0.55); }
+
+/* ── Layout ── */
+.page-layout { display: flex; max-width: 1100px; margin: 0 auto; gap: 0; }
+.sidebar {
+  width: 220px; flex-shrink: 0;
+  padding: 28px 0 40px 24px;
+  position: sticky; top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+.sidebar-title {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase;
+  color: var(--fg3); margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.sidebar-links { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-links a {
+  font-size: 13px; color: var(--fg3); padding: 5px 8px; border-radius: 5px;
+  text-decoration: none; transition: background 0.12s, color 0.12s;
+}
+.sidebar-links a:hover { color: var(--accent); background: var(--accent-dim); }
+.sidebar-links a.active { color: var(--accent); background: var(--accent-dim); font-weight: 500; }
+
+main { flex: 1; min-width: 0; padding: 32px 24px 60px; }
+
+/* ── Section & metric cards ── */
+.section-anchor { scroll-margin-top: 70px; }
+.section-title {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--fg3);
+  margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.section-title:first-child { margin-top: 0; }
+
+.metric-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 16px;
+}
+.metric-card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.metric-card-header h3 { font-size: 15px; font-weight: 600; color: var(--fg); flex: 1; }
+.metric-body { padding: 20px; }
+.metric-body p { color: var(--fg2); font-size: 14px; margin-bottom: 10px; }
+.metric-body p:last-child { margin-bottom: 0; }
+
+table.provenance {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+}
+table.provenance th {
+  padding: 8px 14px; text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--fg3);
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+table.provenance td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  color: var(--fg2); vertical-align: top;
+}
+table.provenance tr:last-child td { border-bottom: none; }
+table.provenance td:first-child { color: var(--fg3); font-weight: 600; white-space: nowrap; width: 140px; }
+
+/* ── Tag chips ── */
+.tag {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 4px; vertical-align: middle;
+}
+.tag-obs  { background: rgba(26,120,64,0.12); color: #1a7840; }
+.tag-est  { background: rgba(168,104,32,0.14); color: #a86820; }
+.tag-pend { background: var(--pending-bg); color: var(--pending); }
+.tag-off  { background: rgba(26,92,168,0.10); color: #1a5ca8; }
+.tag-mod  { background: rgba(90,50,140,0.10); color: #6a3090; }
+.tag-demo { background: rgba(200,40,40,0.10); color: #c02828; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tag-obs { color: #3ab870; }
+  :root:not([data-theme="light"]) .tag-off { color: #3a8fdf; }
+  :root:not([data-theme="light"]) .tag-mod { color: #a070d0; }
+  :root:not([data-theme="light"]) .tag-demo { color: #f07070; }
+  :root:not([data-theme="light"]) .tag-est { color: #c89040; }
+}
+:root[data-theme="dark"] .tag-obs { color: #3ab870; }
+:root[data-theme="dark"] .tag-off { color: #3a8fdf; }
+:root[data-theme="dark"] .tag-mod { color: #a070d0; }
+:root[data-theme="dark"] .tag-demo { color: #f07070; }
+:root[data-theme="dark"] .tag-est { color: #c89040; }
+
+/* ── Formula box ── */
+.formula-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 18px; margin: 14px 0;
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  color: var(--fg2); white-space: pre-wrap; line-height: 1.7;
+}
+.formula-box strong { color: var(--accent); }
+
+/* ── Glossary ── */
+.glossary-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+  gap: 14px;
+}
+.gloss-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px;
+}
+.gloss-card h4 { font-size: 13px; font-weight: 700; color: var(--fg); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.gloss-card p { font-size: 13px; color: var(--fg2); line-height: 1.6; }
+
+/* ── Assumption registry ── */
+.assumption-table {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.assumption-table th {
+  padding: 9px 14px; text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--fg3); background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+.assumption-table td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--fg2); vertical-align: top;
+}
+.assumption-table tr:last-child td { border-bottom: none; }
+.assumption-table td.a-id {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  color: var(--accent); white-space: nowrap;
+}
+.flag-editable {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+  background: var(--accent-dim); color: var(--accent);
+  padding: 2px 7px; border-radius: 4px; display: inline-block; margin-top: 4px;
+}
+
+/* ── Scope table ── */
+.scope-table {
+  width: 100%; border-collapse: collapse; font-size: 13.5px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+}
+.scope-table th {
+  padding: 9px 14px; text-align: left;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--fg3); background: var(--surface2); border-bottom: 1px solid var(--border);
+}
+.scope-table td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--fg2); vertical-align: top;
+}
+.scope-table tr:last-child td { border-bottom: none; }
+.scope-table td.s-item { color: var(--fg); font-weight: 500; }
+.included { color: var(--ok); font-weight: 600; }
+.excluded { color: #c02828; font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .excluded { color: #f07070; }
+}
+:root[data-theme="dark"] .excluded { color: #f07070; }
+
+/* ── Update log ── */
+.update-log {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; font-size: 13.5px;
+}
+.update-log .log-row {
+  display: flex; gap: 16px; padding: 11px 16px;
+  border-bottom: 1px solid var(--border); align-items: flex-start;
+}
+.update-log .log-row:last-child { border-bottom: none; }
+.log-date { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--fg3); white-space: nowrap; min-width: 80px; padding-top: 1px; }
+.log-text { color: var(--fg2); }
+.log-text strong { color: var(--fg); }
+
+/* ── Footer ── */
+footer {
+  border-top: 1px solid var(--border); padding: 20px 24px;
+  text-align: center; font-size: 12px; color: var(--fg3); margin-top: 40px;
+}
+footer a { color: var(--fg3); }
+
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .page-layout { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: static; padding: 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-links { flex-direction: row; flex-wrap: wrap; }
+  main { padding: 20px 16px 48px; }
+  nav { padding: 0 16px; height: auto; padding-block: 10px; }
+  .nav-brand { margin-right: 0; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">🌊 Jalna Water Intelligence</span>
+  <div class="nav-links">
+    <a href="index.html">Overview</a>
+    <a href="rajegaon.html">Rajegaon</a>
+    <a href="mandala-talab.html">Mandala Talab</a>
+    <a href="methods.html" class="active">Data &amp; Methods</a>
+  </div>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="toggleTheme()">☀ / ☾</button>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>Data &amp; Methods</h1>
+    <p>Full provenance for every metric displayed on this site · Version 0.2 · October 2026</p>
+  </div>
+</div>
+
+<div class="page-layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">On this page</div>
+    <div class="sidebar-links">
+      <a href="#evidence-types">Evidence types</a>
+      <a href="#rajegaon-metrics">Rajegaon metrics</a>
+      <a href="#valve-hours">Valve ON hours</a>
+      <a href="#lpcd">Estimated LPCD</a>
+      <a href="#population">Population</a>
+      <a href="#oht">OHT state</a>
+      <a href="#equity">Water Equity Index</a>
+      <a href="#mandala-metrics">Mandala Talab</a>
+      <a href="#bathymetry">Bathymetric ground-truthing</a>
+      <a href="#assumptions">Assumption registry</a>
+      <a href="#scope">Site scope</a>
+      <a href="#update-log">Update log</a>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- Evidence types glossary -->
+    <div id="evidence-types" class="section-anchor"></div>
+    <div class="section-title">Evidence type labels</div>
+    <p style="font-size:14px; color:var(--fg2); margin-bottom:16px;">
+      Every metric on this site carries one of six labels describing what kind of evidence
+      supports it. The label appears as a small chip beside or below the number.
+    </p>
+    <div class="glossary-grid">
+      <div class="gloss-card">
+        <h4><span class="tag tag-obs">Observed</span></h4>
+        <p>Raw telemetry recorded directly by an IoT device or sensor in the field, transmitted to SICCA with a timestamp. No inference or extrapolation.</p>
+      </div>
+      <div class="gloss-card">
+        <h4><span class="tag tag-off">Official</span></h4>
+        <p>A figure from a dated government document, survey, or gazette (e.g. Census population, WRD design note). Source and date are cited.</p>
+      </div>
+      <div class="gloss-card">
+        <h4><span class="tag tag-est">Estimated</span></h4>
+        <p>Calculated from observed inputs using an explicit formula and one or more stated assumptions. The result may differ from actual physical quantities.</p>
+      </div>
+      <div class="gloss-card">
+        <h4><span class="tag tag-mod">Modelled</span></h4>
+        <p>Output of a calibrated numerical model or algorithm (e.g. satellite-derived water area using NDWI). Requires peer review before display.</p>
+      </div>
+      <div class="gloss-card">
+        <h4><span class="tag tag-pend">Unavailable</span></h4>
+        <p>The data source exists but has not been collected, linked, or validated for this site. The metric slot shows a dash or "—" until ready.</p>
+      </div>
+      <div class="gloss-card">
+        <h4><span class="tag tag-demo">Demo</span></h4>
+        <p>Synthetic or illustrative value generated during system design. <strong>Never displayed on the public site.</strong> Used only in internal test screens.</p>
+      </div>
+    </div>
+
+    <!-- ── Rajegaon metrics ── -->
+    <div id="rajegaon-metrics" class="section-anchor"></div>
+    <div class="section-title">Rajegaon Village — metric provenance</div>
+
+    <!-- Valve ON hours -->
+    <div id="valve-hours" class="section-anchor"></div>
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>Total valve ON hours — 88-day period</h3>
+        <span class="tag tag-obs">Observed</span>
+        <span style="font-size:13px; color:var(--fg3);">Displayed value: 198.2 hrs</span>
+      </div>
+      <div class="metric-body">
+        <table class="provenance">
+          <tr><td>Definition</td><td>Cumulative duration (in decimal hours) during which a gravity-distribution valve reported an ON command in the SICCA controller log, summed across all 10 residential zones, for the period of record.</td></tr>
+          <tr><td>Source</td><td>SICCA IoT controller event log — Rajegaon village, exported 2026-10 by DSOC AI Research Lab</td></tr>
+          <tr><td>Period</td><td>88 days (exact dates to be added when dataset is formally archived)</td></tr>
+          <tr><td>What it measures</td><td>Controller valve-command ON time. This is <strong>not</strong> pump running time, flow meter reading, or metered water delivered. The controller records a command state; whether water physically flowed is not confirmed by this sensor alone.</td></tr>
+          <tr><td>Per-zone values</td><td>A1 14.60 h · A2 14.03 h · A3 15.92 h · A4 33.12 h · A5 13.98 h · B1 33.76 h · B2 20.28 h · B3 23.59 h · C1 16.99 h · C2 11.88 h</td></tr>
+          <tr><td>Limitations</td><td>A valve-open command does not guarantee flow (upstream head may be insufficient). Concurrent openings on shared mains may reduce per-zone pressure below the assumed rate. Valve mechanical condition is unknown.</td></tr>
+          <tr><td>Admin note</td><td>Label as "Valve ON hours (OBSERVED)" — never as "Pump hours" or "Water delivered".</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- LPCD -->
+    <div id="lpcd" class="section-anchor"></div>
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>Estimated LPCD — per zone &amp; village average</h3>
+        <span class="tag tag-est">Estimated</span>
+        <span style="font-size:13px; color:var(--fg3);">Village average: 52.5 L/c/d</span>
+      </div>
+      <div class="metric-body">
+        <p>LPCD (litres per capita per day) is the standard measure of domestic water supply adequacy. India's national benchmark is 55 LPCD for fully piped rural supply. This figure is <strong>estimated</strong>, not metered.</p>
+        <div class="formula-box"><strong>LPCD (zone z)</strong>  =
+  (Valve ON hours[z] × 60 min/hr × Flow rate assumption [L/min])
+  ÷ Zone population[z]
+  ÷ Days in period (88)
+
+<strong>Village LPCD</strong>  =
+  (Sum of all zone volumes) ÷ Total population ÷ 88
+        </div>
+        <table class="provenance">
+          <tr><td>Flow assumption</td><td><strong>1,000 L/min</strong> constant at each valve — assumption A-001. This figure is not calibrated; no flow meter is installed. It is the primary source of uncertainty in all LPCD estimates.</td></tr>
+          <tr><td>Population source</td><td>2,574 total (OFFICIAL — see below). Per-zone populations from SICCA zone-mapping file, crosschecked against Rajegaon SICCA app screenshot (11 Oct 2026).</td></tr>
+          <tr><td>Period</td><td>88 days</td></tr>
+          <tr><td>Sensitivity</td><td>If actual flow is 800 L/min, all LPCD values fall by 20%. If concurrent valve openings reduce head, effective flow per zone may be lower still. See assumption registry (A-001, A-002).</td></tr>
+          <tr><td>Benchmark</td><td>55 LPCD — India national service level benchmark for fully piped rural supply (MoJS). Displayed as a dashed reference line on zone bar charts.</td></tr>
+          <tr><td>What it is not</td><td>Not a metered reading. Not a certified audit figure. Not comparable to a utility's reported supply without independent flow calibration.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Population -->
+    <div id="population" class="section-anchor"></div>
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>Rajegaon population</h3>
+        <span class="tag tag-off">Official</span>
+        <span style="font-size:13px; color:var(--fg3);">2,574</span>
+      </div>
+      <div class="metric-body">
+        <table class="provenance">
+          <tr><td>Source</td><td>SICCA zone mapping file — attributed to official Village-level survey/Census data</td></tr>
+          <tr><td>Limitations</td><td>Population may have changed since the census reference date. Seasonal migration is not captured. Float population (workers, visitors) is excluded.</td></tr>
+          <tr><td>Per-zone breakdown</td><td>10 residential zones (A1–C2); zone-level figures used for LPCD denominators. Zone 12 = Tank (excluded from residential calculations).</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- OHT state -->
+    <div id="oht" class="section-anchor"></div>
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>OHT (Overhead Tank) discrete state</h3>
+        <span class="tag tag-obs">Observed</span>
+        <span style="font-size:13px; color:var(--fg3);">Currently: Data required / Pending</span>
+      </div>
+      <div class="metric-body">
+        <p>The Rajegaon OHT is instrumented with two float-switch probes: a lower probe at approximately 50,000 litres and an upper probe at approximately 100,000 litres.</p>
+        <table class="provenance">
+          <tr><td>Valid states</td><td>
+            <strong>Below lower probe</strong> (both probes off) ·
+            <strong>Between probes</strong> (lower on, upper off) ·
+            <strong>At / above upper probe</strong> (both probes on) ·
+            <strong>Inconsistent reading</strong> (upper on, lower off — hardware check needed) ·
+            <strong>Unknown</strong> (no telemetry)
+          </td></tr>
+          <tr><td>What cannot be displayed</td><td>A continuous fill percentage (e.g. "73%"). Two binary probes cannot produce a continuous level measurement. Displaying any percentage derived from these sensors would misrepresent their capability.</td></tr>
+          <tr><td>Current status</td><td>Probe telemetry not yet confirmed in live SICCA feed for this dataset. State shown as "Data required — Pending probe verification".</td></tr>
+          <tr><td>Threshold values</td><td>Lower probe: ~50,000 L (unverified; requires calibration). Upper probe: ~100,000 L (unverified). Exact thresholds to be updated once commissioning is documented.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Water Equity Index -->
+    <div id="equity" class="section-anchor"></div>
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>Water Equity Index</h3>
+        <span class="tag tag-pend">Not calculable</span>
+      </div>
+      <div class="metric-body">
+        <p>
+          A meaningful Water Equity Index requires two inputs that are not currently available for Rajegaon:
+        </p>
+        <ol style="margin: 10px 0 14px 20px; color: var(--fg2); font-size: 14px; line-height: 1.8;">
+          <li><strong>Confirmed schedule adherence</strong> — which zones receive water on which days, and whether that schedule is equitable across the village.</li>
+          <li><strong>Calibrated zone-level flows</strong> — actual volume delivered per zone, not an estimate derived from an unverified flow assumption.</li>
+        </ol>
+        <p>
+          Without these, any equity score would be dominated by the uncertainty in the flow assumption (A-001).
+          Zones with longer valve-open times appear to receive more water, but this could reflect operating schedule differences
+          rather than genuine supply inequity — or vice versa.
+        </p>
+        <p>
+          The dashboard displays this metric as <strong>NOT CALCULABLE — reliability data missing</strong>.
+          No composite score is fabricated as a placeholder. The metric will appear when calibrated flow data and
+          confirmed schedule data are available and reviewed.
+        </p>
+        <table class="provenance">
+          <tr><td>Candidate formula</td><td>Coefficient of variation (CV) of zone LPCD values — lower CV = more equitable distribution. Not displayed until flow data is calibrated.</td></tr>
+          <tr><td>Blocker 1</td><td>No flow meter installed; LPCD is estimated under a single constant-rate assumption (A-001).</td></tr>
+          <tr><td>Blocker 2</td><td>Official supply schedule (days per week per zone) not confirmed in writing.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Mandala Talab metrics ── -->
+    <div id="mandala-metrics" class="section-anchor"></div>
+    <div class="section-title">Mandala Talab Reservoir — metric provenance</div>
+
+    <div class="metric-card">
+      <div class="metric-card-header">
+        <h3>All Mandala Talab metrics</h3>
+        <span class="tag tag-pend">Unavailable</span>
+      </div>
+      <div class="metric-body">
+        <p>
+          No Mandala Talab storage, fill-level, inflow, or surface-area figures are displayed on this site.
+          The reason for each missing metric is documented in the
+          <a href="mandala-talab.html">Mandala Talab page</a> data-readiness checklist.
+        </p>
+        <table class="provenance">
+          <tr><td>Prototype figures</td>
+              <td>Capacity 7.10 ML, storage 4.82 ML, fill 67.9% — these are <span class="tag tag-demo">Demo</span> values generated arithmetically during dashboard prototype design. They have no basis in sensor data or official WRD records. They are excluded from all public pages.</td></tr>
+          <tr><td>Satellite water area</td>
+              <td>Scene selection not complete. No cloud-free Sentinel-2 or PlanetScope image has been QA'd for this reservoir. No NDWI extraction or boundary shapefile has been peer-reviewed. A placeholder outline or generic lake image is not an acceptable substitute.</td></tr>
+          <tr><td>Capacity</td>
+              <td>No WRD design note or gazette reference for Mandala Talab has been obtained. Figure will be labelled OFFICIAL once a dated authoritative source is cited.</td></tr>
+          <tr><td>Location</td>
+              <td>Approximate centroid 19.844°N 75.888°E — displayed as a single map point only. No water-extent polygon is drawn.</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Bathymetric ground-truthing ── -->
+    <div id="bathymetry" class="section-anchor"></div>
+    <div class="section-title">Bathymetric ground-truthing — why DSOC AI data is uniquely accurate</div>
+    <p style="font-size:14px; color:var(--fg2); margin-bottom:16px;">
+      Estimating how much water a reservoir holds is harder than it looks. This section explains
+      the scientific limitation of common remote-sensing approaches, and why the acoustic bathymetric
+      survey capability that DSOC AI brings to the Jalna pilot produces defensibly accurate volume
+      estimates that no satellite or standard aerial survey alone can match.
+    </p>
+
+    <div class="metric-card" style="margin-bottom:16px;">
+      <div class="metric-card-header">
+        <h3>Why satellite imagery cannot give reservoir volume</h3>
+      </div>
+      <div class="metric-card-body">
+        <p style="margin-bottom:10px;">
+          Multispectral satellites (Sentinel-2, PlanetScope, Landsat) detect reflected light.
+          Water absorbs near-infrared strongly, so a Normalised Difference Water Index (NDWI) extraction
+          reliably maps the <em>surface area</em> of a waterbody on a given date.
+          It cannot see below the surface. Area is two-dimensional; volume is three-dimensional.
+        </p>
+        <p style="margin-bottom:10px;">
+          Converting area to volume requires knowing how steeply and uniformly the reservoir bed
+          slopes at every point — the <strong>bathymetry</strong>. Two reservoirs with identical
+          satellite-derived surface areas can hold vastly different volumes if one is a shallow
+          saucer and the other is a deep bowl. Without a measured depth profile, any volume
+          figure derived from satellite area alone is speculation, not science.
+        </p>
+        <table class="provenance">
+          <tr>
+            <td>What satellites give</td>
+            <td>Surface water area (m²) — OBSERVED on the date of the scene</td>
+          </tr>
+          <tr>
+            <td>What satellites cannot give</td>
+            <td>Water depth at any point; bed topography below the water line; reservoir volume</td>
+          </tr>
+          <tr>
+            <td>Uncertainty without bathymetry</td>
+            <td>Volume error can exceed 50–200% depending on reservoir geometry — errors too large to base infrastructure decisions on</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="metric-card" style="margin-bottom:16px;">
+      <div class="metric-card-header">
+        <h3>Why topographic LiDAR cannot substitute</h3>
+      </div>
+      <div class="metric-card-body">
+        <p style="margin-bottom:10px;">
+          Airborne LiDAR (Light Detection And Ranging) fires laser pulses at the ground and
+          records the return time to build a high-resolution Digital Elevation Model (DEM).
+          This produces excellent above-water terrain data. However, laser pulses do not
+          penetrate more than a few centimetres into turbid water.
+        </p>
+        <p style="margin-bottom:10px;">
+          For a reservoir that is partially or fully inundated — the normal operating condition
+          of a storage reservoir — topographic LiDAR <strong>cannot recover submerged bathymetry</strong>.
+          The water surface returns a reflection; the bed below it is invisible to the sensor.
+          Only areas that happen to be exposed (dry margins at very low fill) contribute useful
+          elevation data, and those margins are precisely where bed geometry matters least for
+          volume calculation.
+        </p>
+        <table class="provenance">
+          <tr>
+            <td>LiDAR strength</td>
+            <td>Above-water terrain — excellent DEM for watershed delineation, catchment area, spillway elevation</td>
+          </tr>
+          <tr>
+            <td>LiDAR limit</td>
+            <td>Cannot penetrate turbid water; submerged bed is a data gap in all standard LiDAR products</td>
+          </tr>
+          <tr>
+            <td>Consequence</td>
+            <td>Volume curves derived from LiDAR alone are extrapolated from exposed margins and are unreliable for operational storage estimation</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="metric-card" style="margin-bottom:16px;">
+      <div class="metric-card-header">
+        <h3>DSOC AI acoustic bathymetric survey — the ground-truth layer</h3>
+        <span class="tag tag-obs">Observed</span>
+      </div>
+      <div class="metric-card-body">
+        <p style="margin-bottom:10px;">
+          DSOC AI's field methodology combines acoustic depth-sounding (sonar) with differential
+          GNSS positioning to map the actual bed of each reservoir. A transducer emits sound pulses
+          downward through the water column; the return echo timing gives water depth at each survey
+          point with centimetre-level accuracy. The vessel track covers the reservoir in systematic
+          cross-hatch or parallel lines, producing a dense point cloud of (x, y, depth) measurements
+          across the entire inundated area.
+        </p>
+        <p style="margin-bottom:10px;">
+          These depth measurements — combined with a concurrent water-surface elevation from a
+          differential GNSS reference — are interpolated into a full <strong>stage-area-storage curve</strong>:
+          a precise mathematical relationship between water level (stage, in metres), surface area
+          (ha), and stored volume (ML) for that specific reservoir.
+        </p>
+        <p style="margin-bottom:10px;">
+          This curve is the foundation of every defensible volume estimate. Once surveyed, any
+          future water level reading — from an IoT pressure transducer, a float sensor, or a
+          satellite-derived surface elevation — can be converted to volume with quantified accuracy
+          rather than an assumed geometry.
+        </p>
+        <table class="provenance">
+          <tr>
+            <td>Survey instrument</td>
+            <td>Acoustic depth sounder (sonar) + differential GNSS — sub-decimetre depth accuracy</td>
+          </tr>
+          <tr>
+            <td>Output</td>
+            <td>Full bed elevation model for the inundated area; validated stage-area-storage curve S(h)</td>
+          </tr>
+          <tr>
+            <td>Integration</td>
+            <td>DEM and satellite-derived products (LiDAR, NDWI area) are calibrated against and combined with the acoustic survey — each data source fills the gap the others cannot</td>
+          </tr>
+          <tr>
+            <td>Volume accuracy</td>
+            <td>With a surveyed stage-storage curve, volume error is dominated by the water-level sensor, typically ±1–3% — far smaller than the ±50–200% error from an unsurveyed geometry assumption</td>
+          </tr>
+          <tr>
+            <td>Status at Mandala Talab</td>
+            <td>Acoustic bathymetric survey planned. Volume and fill metrics will be published once the survey is complete and the stage-storage curve is validated. <strong>No volume figure will be displayed before this survey is done.</strong></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="metric-card" style="margin-bottom:24px;">
+      <div class="metric-card-header">
+        <h3>Why only DSOC AI can provide this</h3>
+      </div>
+      <div class="metric-card-body">
+        <p style="margin-bottom:10px;">
+          Acoustic bathymetric survey of rural small reservoirs is technically demanding and
+          operationally intensive. It requires specialised sonar equipment, differential GNSS
+          base-station infrastructure, a survey vessel suitable for shallow and variable-depth
+          conditions, field staff trained in acoustic data collection, and post-processing
+          software to convert raw echoes into a georeferenced depth model and calibrated
+          stage-storage curve.
+        </p>
+        <p style="margin-bottom:10px;">
+          Standard remote-sensing services, government survey agencies, and general GIS
+          contractors do not routinely carry out submerged bathymetric surveys of this class
+          at the scale of individual village-level tanks and reservoirs. Satellite-only analyses —
+          the most common alternative — produce the area-based figures discussed above, with
+          the volume limitations this section documents.
+        </p>
+        <p style="margin-bottom:0;">
+          DSOC AI's combination of acoustic field survey, IoT instrumentation, and satellite
+          time-series analysis produces the only technically defensible storage and fill
+          estimates for reservoirs of this type in the Jalna district. When this site
+          eventually publishes a volume figure for Mandala Talab, it will be grounded in
+          a measured stage-storage curve — not an assumed geometry, a generic DEM, or an
+          extrapolated satellite relationship.
+        </p>
+      </div>
+    </div>
+
+    <!-- ── Assumption registry ── -->
+    <div id="assumptions" class="section-anchor"></div>
+    <div class="section-title">Assumption registry</div>
+    <p style="font-size:14px; color:var(--fg2); margin-bottom:14px;">
+      Every number that is not directly measured and not from an official document is listed here
+      with a versioned ID. Each assumption can be updated by an administrator without code changes;
+      the version number increments on each change and the dashboard re-labels all dependent metrics.
+    </p>
+    <table class="assumption-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Assumption</th>
+          <th>Current value</th>
+          <th>Justification &amp; limitations</th>
+          <th>Version</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="a-id">A-001</td>
+          <td>Gravity valve flow rate</td>
+          <td><strong>1,000 L/min</strong><br><span class="flag-editable">Admin editable</span></td>
+          <td>Working estimate. No flow meter is installed. Based on typical 25 mm gravity main at modest head; not field-calibrated for Rajegaon. Primary source of uncertainty in all LPCD values. Calibrate by catching timed volume from open valve.</td>
+          <td>v1 · Oct 2026</td>
+        </tr>
+        <tr>
+          <td class="a-id">A-002</td>
+          <td>Concurrent valve independence</td>
+          <td>Zones assumed <strong>independent</strong></td>
+          <td>Not confirmed. If multiple zones open simultaneously on a shared main with limited inlet head, per-zone flow may drop below 1,000 L/min. Actual flow distribution under concurrent opening is unknown. LPCD could be overstated when multiple valves open together.</td>
+          <td>v1 · Oct 2026</td>
+        </tr>
+        <tr>
+          <td class="a-id">A-003</td>
+          <td>Period of record</td>
+          <td><strong>88 days</strong></td>
+          <td>Derived from the event-log export provided. Exact start and end dates to be confirmed when dataset is formally archived. Used as denominator in all LPCD calculations.</td>
+          <td>v1 · Oct 2026</td>
+        </tr>
+        <tr>
+          <td class="a-id">A-004</td>
+          <td>LPCD benchmark</td>
+          <td><strong>55 L/c/d</strong></td>
+          <td>India National Service Level Benchmark for fully piped rural supply (Ministry of Jal Shakti). Used as reference line on zone LPCD chart. Not a regulatory threshold for this specific scheme.</td>
+          <td>v1 · Oct 2026</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ── Site scope ── -->
+    <div id="scope" class="section-anchor"></div>
+    <div class="section-title">Site scope — what is and is not included</div>
+    <table class="scope-table">
+      <thead>
+        <tr><th>Item</th><th>Status</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="s-item">Rajegaon IoT village data</td><td class="included">Included</td><td>Verified SICCA controller log; actual valve events</td></tr>
+        <tr><td class="s-item">Mandala Talab location identity</td><td class="included">Included</td><td>Public geographic reference; no sensor data shown</td></tr>
+        <tr><td class="s-item">Rajegaon OHT probe state</td><td class="included">Included (pending)</td><td>Two binary probes instrumented; telemetry under verification</td></tr>
+        <tr><td class="s-item">Jalna district totals (958 villages)</td><td class="excluded">Excluded</td><td>Only 1 IoT village is connected; district totals would misrepresent coverage</td></tr>
+        <tr><td class="s-item">District reservoir totals</td><td class="excluded">Excluded</td><td>No district-wide sensor network; figures would be illustrative at best</td></tr>
+        <tr><td class="s-item">District Water Security Index</td><td class="excluded">Excluded</td><td>Requires district-wide supply data — not available</td></tr>
+        <tr><td class="s-item">District Water Equity score</td><td class="excluded">Excluded</td><td>Requires calibrated multi-village data — not available</td></tr>
+        <tr><td class="s-item">Mandala Talab storage / fill %</td><td class="excluded">Excluded</td><td>No level sensor installed; prototype demo values are not published</td></tr>
+        <tr><td class="s-item">Satellite water extent polygon</td><td class="excluded">Excluded</td><td>Scene selection and QA not complete; no peer-reviewed shapefile available</td></tr>
+        <tr><td class="s-item">Device control interfaces</td><td class="excluded">Excluded</td><td>Control, credentials and commissioning remain in the secure SICCA environment</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── Update log ── -->
+    <div id="update-log" class="section-anchor"></div>
+    <div class="section-title">Update log</div>
+    <div class="update-log">
+      <div class="log-row">
+        <div class="log-date">Oct 2026</div>
+        <div class="log-text">
+          <strong>V0.2 rebuild.</strong> Replaced 5-dashboard prototype (dummy data) with 4 honest views
+          covering 2 pilot entities only. All metrics assigned evidence-type labels.
+          Prototype demo figures (7.10 ML capacity, 4.82 ML storage, 67.9% fill) removed from public site.
+          Water Equity Index declared NOT CALCULABLE. OHT discrete-state display added.
+          Assumption registry created (A-001 through A-004).
+        </div>
+      </div>
+      <div class="log-row">
+        <div class="log-date">Oct 2026</div>
+        <div class="log-text">
+          <strong>V0.1 prototype.</strong> Initial 5-dashboard site with illustrative/demo data.
+          Superseded by V0.2 following Jasveer's data-integrity review.
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<footer>
+  <div>Jalna Water Intelligence · Data &amp; Methods · Version 0.2 · October 2026</div>
+  <div style="margin-top:4px">Questions: <a href="mailto:dsocai.students@wku.edu">DSOC AI Research Lab</a></div>
+</footer>
+
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const cur = root.getAttribute('data-theme');
+  if (cur === 'dark') root.setAttribute('data-theme', 'light');
+  else if (cur === 'light') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme', 'dark');
+}
+
+// Sidebar active-link tracking
+const sections = document.querySelectorAll('.section-anchor');
+const links = document.querySelectorAll('.sidebar-links a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      links.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
